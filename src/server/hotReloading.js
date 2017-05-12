@@ -40,6 +40,10 @@ class HotReloading {
 
     this.compiler.plugin('done', stats => {
       this.stats = stats
+      if (this.success) {
+        // TODO: Collect changes and send to client via hotMiddleware.publish
+      }
+
       this.success = true
     })
 

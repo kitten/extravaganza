@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 
 const sanitizeCSS = readFileSync(
-  require.resolve('sanitize.css/sanitize.css'),
+  require.resolve('marx-css/css/marx.min.css'),
   { encoding: 'utf8' }
 )
 

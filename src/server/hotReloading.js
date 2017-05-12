@@ -8,12 +8,36 @@ import resolvePaths from '../utils/resolvePaths'
 import filterSlideChunks from '../utils/filterSlideChunks'
 import webpackCompiler from '../webpack/compiler'
 
+const deleteCache = path => {
+  delete require.cache[path]
+}
+
 class HotReloading {
   constructor() {
     this.success = false
   }
 
   prepareMiddleware(app) {
+    // Purge outdated assets from module cache
+    this.compiler.plugin('after-emit', (compilation, callback) => {
+      const { assets } = compilation
+
+      if (this.prevAssets !== undefined) {
+        for (const assetKey of Object.keys(assets)) {
+          deleteCache(assets[assetKey].existsAt)
+        }
+
+        for (const assetKey of Object.keys(this.prevAssets)) {
+          if (!assets[assetKey]) {
+            deleteCache(this.prevAssets[assetKey].existsAt)
+          }
+        }
+      }
+
+      this.prevAssets = assets
+      callback()
+    })
+
     this.compiler.plugin('done', stats => {
       this.stats = stats
       this.success = true

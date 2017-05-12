@@ -1,4 +1,5 @@
 import express from 'express'
+import moduleAlias from 'module-alias'
 
 import HotReloading from './hotReloading'
 import requestHandler from './requestHandler'
@@ -12,6 +13,9 @@ const server = async () => {
   if (!isProd) {
     hotReloading = new HotReloading()
     await hotReloading.start(app)
+  } else {
+    moduleAlias.addAlias('react', 'preact-compat')
+    moduleAlias.addAlias('react-dom', 'preact-compat')
   }
 
   // Disable Express X-Powered-By header

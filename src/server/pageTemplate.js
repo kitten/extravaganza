@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs'
-import { template } from 'rapscallion'
 
 const sanitizeCSS = readFileSync(
   require.resolve('sanitize.css/sanitize.css'),
@@ -21,7 +20,7 @@ const pageSlideScripts = slides => slides
   `)
   .join('')
 
-const makePageTemplate = (app, slides) => template`
+const makePageTemplate = (app, slides) => `
   <html>
     <head>
       <meta httpequiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -37,11 +36,12 @@ const makePageTemplate = (app, slides) => template`
     <body>
       <div id="root">${app}</div>
 
+      <script type="text/javascript" src="/_extravaganza/webpack/manifest.js"></script>
+      <script type="text/javascript" src="/_extravaganza/webpack/commons.js"></script>
+
       ${pageBucketScript}
       ${pageSlideScripts(slides)}
 
-      <script type="text/javascript" src="/_extravaganza/webpack/manifest.js"></script>
-      <script type="text/javascript" src="/_extravaganza/webpack/commons.js"></script>
       <script type="text/javascript" src="/_extravaganza/webpack/main.js"></script>
     </body>
   </html>

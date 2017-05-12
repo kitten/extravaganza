@@ -1,10 +1,10 @@
 // Source: next.js
 // https://github.com/zeit/next.js/blob/master/server/build/plugins/pages-plugin.js
 
-const wrapCode = (routeName, content) => (`
+const wrapCode = (chunkId, routeName, content) => (`
 window.__REGISTER_SLIDE__('${routeName}', function() {
   var comp = ${content};
-  return comp;
+  return { slideLoader: comp, chunkId: ${chunkId} };
 })
 `).trim()
 
@@ -29,8 +29,9 @@ class SlidePlugin {
             routeName = routeName.replace(/\\/g, '/')
           }
 
+          const chunkId = chunk.entryModule.index2
           const content = slide.source()
-          const newContent = wrapCode(routeName, content)
+          const newContent = wrapCode(chunkId, routeName, content)
 
           // Replace the exisiting chunk with the new content
           compilation.assets[chunk.name] = {

@@ -4,9 +4,11 @@ import glob from 'glob-promise'
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin'
 import WriteFilePlugin from 'write-file-webpack-plugin'
+import sort from 'alphanum-sort'
 
 import resolvePaths from '../utils/resolvePaths'
 import SlidePlugin from './plugins/slidePlugin'
+import WatchSlidePlugin from './plugins/watchSlidePlugin'
 
 import {
   getContext,
@@ -16,31 +18,40 @@ import {
 } from '../user/config'
 
 const makeCompiler = async ({ production }) => {
-  const entry = {
-    'main.js': [
-      !production && 'webpack-hot-middleware/client?overlay=false&reload=true&path=/_extravaganza/hmr',
-      require.resolve('../client/index')
-    ].filter(Boolean)
-  }
-
-  const slides = await glob('slides/**/*.js', { cwd: getContext() })
-  for (const slide of slides) {
-    if (entry[slide] === undefined) {
-      entry[slide] = [ resolvePaths(getContext(), slide) ]
+  const makeEntry = async () => {
+    const entry = {
+      'main.js': [
+        !production && require.resolve('../client/hotMiddlewareClient'),
+        require.resolve('../client/index')
+      ].filter(Boolean)
     }
+
+    const slides = await glob('slides/**/*.js', { cwd: getContext() })
+
+    for (const slide of sort(slides)) {
+      if (entry[slide] === undefined) {
+        entry[slide] = [ `./${slide}` ]
+      }
+    }
+
+    return entry
   }
 
-  const totalSlides = slides.length
+  let totalSlides
+  if (production) {
+    const _slides = await glob('slides/**/*.js', { cwd: getContext() })
+    totalSlides = _slides.length
+  }
 
   const config = {
     context: getContext(),
     devtool: production ? false : 'cheap-module-inline-source-map',
-    entry,
+    entry: makeEntry,
 
     output: {
       path: getBuildFolder(production),
       filename: '[name]',
-      chunkFilename: '[id]-[name].js',
+      chunkFilename: '[id]-slide.js',
       publicPath: '/_extravaganza/webpack/',
       strictModuleExceptionHandling: true
     },
@@ -62,7 +73,7 @@ const makeCompiler = async ({ production }) => {
             loader: 'bundle-loader',
             options: {
               lazy: true,
-              name: 'slide'
+              name: '[name]'
             }
           }]
         }, {
@@ -141,6 +152,7 @@ const makeCompiler = async ({ production }) => {
         sourceMap: false
       })
     ] : [
+      new WatchSlidePlugin(getSlidesFolder()),
       new webpack.NoEmitOnErrorsPlugin(),
       new webpack.HotModuleReplacementPlugin(),
       new FriendlyErrorsPlugin()

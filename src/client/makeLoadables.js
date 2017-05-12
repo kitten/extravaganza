@@ -7,12 +7,8 @@ import Loading from './loading'
 const ensure = slideLoader => () => new Promise(resolve => slideLoader(resolve))
 
 const routeMatchesIndex = index => matchPath(
-  window.location.pathname, {
-    path: `/${index}`,
-    exact: true,
-    strict: false
-  }
-) !== undefined
+  window.location.pathname, { path: `/${index}` }
+) !== null
 
 const makeLoadables = async slides => {
   const loadables = Object
@@ -20,17 +16,18 @@ const makeLoadables = async slides => {
     .map(async (routeName, index) => {
       const { slideLoader, chunkId } = slides[routeName]()
       const loader = ensure(slideLoader)
-      if (routeMatchesIndex(index)) {
-        await loader()
-      }
 
-      const component = Loadable({
-        loader,
-        webpackRequireWeakId: () => chunkId,
-        resolveModule: module => module.default,
-        LoadingComponent: Loading,
-        delay: 200
-      })
+      let component
+      if (routeMatchesIndex(index)) {
+        component = (await loader()).default
+      } else {
+        component = Loadable({
+          loader,
+          resolveModule: module => module.default,
+          LoadingComponent: Loading,
+          delay: 200
+        })
+      }
 
       return {
         component,

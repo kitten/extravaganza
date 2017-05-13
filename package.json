@@ -9,6 +9,13 @@
   "scripts": {
     "build": "babel src --out-dir lib"
   },
+  "files": [
+    "bin",
+    "lib",
+    "package.json",
+    ".editorconfig",
+    "yarn.lock"
+  ],
   "repository": "https://github.com/philpl/extravaganza",
   "author": "Phil Plückthun <phil@plckthn.me> (https://github.com/philpl)",
   "license": "MIT",

@@ -1,4 +1,4 @@
-import Loadable from 'react-loadable'
+import { createElement } from 'react'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import sort from 'alphanum-sort'
@@ -98,10 +98,10 @@ class HotReloading {
     return this.getSlideNames()
       .map(routeName => {
         const requirePath = resolvePaths(getBuildFolder(false), `dist/${routeName}`)
-        const component = Loadable({
-          serverSideRequirePath: requirePath,
-          resolveModule: module => module.default
-        })
+        const component = () => {
+          const WrappedComponent = require(requirePath).default
+          return createElement(WrappedComponent)
+        }
 
         return {
           component,

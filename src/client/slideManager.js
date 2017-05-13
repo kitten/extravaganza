@@ -24,8 +24,16 @@ class SlideManager {
       .keys(_slideLoaders)
       .map((routeName, index) => {
         const { slideLoader } = _slideLoaders[routeName]()
-        const loader = ensure(slideLoader)
-        return { routeName, loader }
+
+        const entry = { routeName }
+        entry.loader = () => new Promise(resolve => {
+          slideLoader(component => {
+            entry.isLoaded = true
+            resolve(component)
+          })
+        })
+
+        return entry
       })
 
     const slides = await Promise.all(

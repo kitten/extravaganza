@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join, relative } from 'path'
 import webpack from 'webpack'
 import glob from 'glob-promise'
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
@@ -22,6 +22,7 @@ const makeCompiler = async ({ production }) => {
     const entry = {
       'main.js': [
         !production && require.resolve('../client/hotMiddlewareClient'),
+        !production && 'react-hot-loader/patch',
         require.resolve('../client/index')
       ].filter(Boolean)
     }
@@ -86,24 +87,30 @@ const makeCompiler = async ({ production }) => {
             /node_modules/,
             getTempFolder()
           ],
-          loader: require.resolve('./loaders/emitFileLoader'),
+          use: [{
+            loader: require.resolve('./loaders/emitFileLoader')
+          }, !production && {
+            loader: require.resolve('./loaders/hotAcceptLoader')
+          }].filter(Boolean)
         }, {
           test: /\.js$/,
           exclude: [
             getTempFolder(),
             /node_modules/
           ],
-          use: [{
+          use: [!production && {
+            loader: 'react-hot-loader/webpack'
+          }, {
             loader: 'babel-loader',
             options: {
               cacheDirectory: resolvePaths(getTempFolder(), 'babel-cache')
             }
-          }]
+          }].filter(Boolean)
         }, {
           test: /\.json$/,
           loader: 'json-loader'
         }
-      ]
+      ].filter(Boolean)
     },
 
     resolve: {
@@ -131,6 +138,12 @@ const makeCompiler = async ({ production }) => {
       }),
 
       new webpack.DefinePlugin({
+        '__CONTEXT__': JSON.stringify(
+          relative(
+            require.resolve('../client/index'),
+            getSlidesFolder()
+          )
+        ),
         'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development')
       }),
 
@@ -140,7 +153,7 @@ const makeCompiler = async ({ production }) => {
         useHashIndex: false
       }),
 
-      new SlidePlugin(),
+      new SlidePlugin(production),
       new CaseSensitivePathsPlugin()
     ].concat(production ? [
       new webpack.optimize.UglifyJsPlugin({

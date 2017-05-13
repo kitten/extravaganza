@@ -15,6 +15,7 @@ const deleteCache = path => {
 class HotReloading {
   constructor() {
     this.success = false
+    this.prevChunks = []
   }
 
   prepareMiddleware(app) {
@@ -39,11 +40,19 @@ class HotReloading {
     })
 
     this.compiler.plugin('done', stats => {
-      this.stats = stats
+      this.stats = stats // Update internal stats
+
+      const { compilation: { chunks }} = stats
+
       if (this.success) {
-        // TODO: Collect changes and send to client via hotMiddleware.publish
+        // Collect changes and send to client via hotMiddleware.publish
+        this.hotMiddleware.publish({
+          chunks: filterSlideChunks(chunks).map(x => x.name),
+          action: 'changed'
+        })
       }
 
+      this.prevChunks = chunks
       this.success = true
     })
 
@@ -87,7 +96,7 @@ class HotReloading {
 
   getSlides() {
     return this.getSlideNames()
-      .map((routeName, index) => {
+      .map(routeName => {
         const requirePath = resolvePaths(getBuildFolder(false), `dist/${routeName}`)
         const component = Loadable({
           serverSideRequirePath: requirePath,
@@ -96,8 +105,7 @@ class HotReloading {
 
         return {
           component,
-          routeName,
-          index
+          routeName
         }
       })
   }

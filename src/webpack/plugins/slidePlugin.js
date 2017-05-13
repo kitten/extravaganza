@@ -9,6 +9,10 @@ window.__REGISTER_SLIDE__('${routeName}', function() {
 `).trim()
 
 class SlidePlugin {
+  constructor(production) {
+    this.production = production
+  }
+
   apply (compiler) {
     const isBundledSlide = /^slides[/\\].*\.js$/
     const matchRouteName = /^slides[/\\](.*)\.js$/

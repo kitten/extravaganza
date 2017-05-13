@@ -1,17 +1,22 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
+import { AppContainer } from 'react-hot-loader'
 
-import App from './app'
-import makeLoadables from './makeLoadables'
+import { SlideProvider } from './app'
+import { notifyHot } from './hotMiddlewareClient'
+import SlideManager from './slideManager'
 
 const node = document.getElementById('root')
+const mount = slideManager => render((
+  <BrowserRouter>
+    <SlideProvider slideManager={slideManager} />
+  </BrowserRouter>
+), node)
 
-makeLoadables(window.__SLIDE_LOADERS__)
-  .then(loadables => {
-    render((
-      <BrowserRouter>
-        <App slides={loadables} />
-      </BrowserRouter>
-    ), node)
+SlideManager
+  .init(window.__SLIDE_LOADERS__)
+  .then(slideManager => {
+    notifyHot(slideManager)
+    mount(slideManager)
   })

@@ -1,9 +1,11 @@
+// Source: next.js
+// https://github.com/zeit/next.js/blob/master/server/build/loaders/emit-file-loader.js
+
 import loaderUtils from 'loader-utils'
 
 module.exports = function emitFileLoader (content, sourceMap) {
   this.cacheable()
 
-  const query = loaderUtils.getOptions(this)
   const name = 'dist/[path][name].[ext]'
   const context = this.options.context
 

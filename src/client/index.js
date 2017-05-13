@@ -17,6 +17,5 @@ const mount = slideManager => render((
 SlideManager
   .init(window.__SLIDE_LOADERS__)
   .then(slideManager => {
-    notifyHot(slideManager)
     mount(slideManager)
   })

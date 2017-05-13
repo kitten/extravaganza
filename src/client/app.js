@@ -18,11 +18,13 @@ export const InnerApp = ({ slides }) => (
 )
 
 class App extends Component {
-  componentWillMount() {
-    const { slideManager } = this.props
+  state = {
+    slides: this.props.slideManager.getSlides()
+  }
 
-    this.unsubscribe = slideManager.subscribe(slides => {
-      this.setState({ slides })
+  componentDidMount() {
+    this.unsubscribe = this.props.slideManager.subscribe(slides => {
+      this.forceUpdate()
     })
   }
 

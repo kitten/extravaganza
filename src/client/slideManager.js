@@ -59,35 +59,40 @@ class SlideManager {
       })
     )
 
-    return new SlideManager(slideLoaders, slides)
-  }
+    const slideManager = new SlideManager(slideLoaders, slides)
 
-  async notifyChanged(routeNames = []) {
-    const { slideLoaders, slides } = this
-
-    const newSlides = await Promise.all(
-      slides.map(async (slide, index) => {
-        if (!routeNames.includes(slide.routeName)) {
-          return slide
+    if (window.__HOT_MIDDLEWARE__) {
+      window.__HOT_MIDDLEWARE__.subscribe(({ action }) => {
+        if (action !== 'changed') {
+          return
         }
 
-        const { loader } = slideLoaders[index]
-        const component = (await loader()).default
+        const checkIdle = status => {
+          if (status === 'idle') {
+            module.hot.removeStatusHandler(checkIdle)
+            slideManager.notifyChanged()
+          }
+        }
 
-        return { ...slide, component }
+        module.hot.status(checkIdle)
       })
-    )
+    }
 
-    console.log('[Extravaganza] Updating slides:', routeNames.join(', '))
+    return slideManager
+  }
 
-    this.slides = newSlides
-    this.emitter.emit('slides', newSlides)
+  notifyChanged(routeNames = []) {
+    console.log('[Extravaganza] Hot reloading slides')
+    this.emitter.emit('hotReload')
+  }
+
+  getSlides() {
+    return this.slides
   }
 
   subscribe(cb) {
-    this.emitter.on('slides', cb)
-    cb(this.slides)
-    return () => this.emitter.off('slides', cb)
+    this.emitter.on('hotReload', cb)
+    return () => this.emitter.off('hotReload', cb)
   }
 }
 

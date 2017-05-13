@@ -17,8 +17,8 @@ const server = async ({ production }) => {
     build = new HotReloading()
     await build.start(app)
   } else {
-    moduleAlias.addAlias('react', 'preact-compat')
-    moduleAlias.addAlias('react-dom', 'preact-compat')
+    moduleAlias.addAlias('react', require.resolve('preact-compat'))
+    moduleAlias.addAlias('react-dom', require.resolve('preact-compat'))
 
     build = new BuildStats()
 

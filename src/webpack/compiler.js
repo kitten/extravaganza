@@ -1,4 +1,4 @@
-import { join, relative } from 'path'
+import { join, relative, resolve } from 'path'
 import webpack from 'webpack'
 import glob from 'glob-promise'
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
@@ -10,6 +10,7 @@ import resolvePaths from '../utils/resolvePaths'
 import SlidePlugin from './plugins/slidePlugin'
 import WatchSlidePlugin from './plugins/watchSlidePlugin'
 import CombineAssetsPlugin from './plugins/combineAssetsPlugin'
+import findBabelConfig from './babel/findConfig'
 
 import {
   getContext,
@@ -18,12 +19,16 @@ import {
   getSlidesFolder
 } from '../user/config'
 
+const nodePathList = (process.env.NODE_PATH || '')
+  .split(process.platform === 'win32' ? ';' : ':')
+  .filter(Boolean)
+
 const makeCompiler = async ({ production }) => {
   const makeEntry = async () => {
     const entry = {
       'main.js': [
         !production && require.resolve('../client/hotMiddlewareClient'),
-        !production && 'react-hot-loader/patch',
+        !production && require.resolve('react-hot-loader/patch'),
         require.resolve('../client/index')
       ].filter(Boolean)
     }
@@ -32,7 +37,7 @@ const makeCompiler = async ({ production }) => {
 
     for (const slide of sort(slides)) {
       if (entry[slide] === undefined) {
-        entry[slide] = [ `./${slide}` ]
+        entry[slide] = [ resolvePaths(getContext(), `./${slide}`) ]
       }
     }
 
@@ -43,6 +48,24 @@ const makeCompiler = async ({ production }) => {
   if (production) {
     const _slides = await glob('slides/**/*.js', { cwd: getContext() })
     totalSlides = _slides.length
+  }
+
+  const babelOptions = {
+    cacheDirectory: true,
+    presets: []
+  }
+
+  const externalBabelConfig = findBabelConfig(getContext())
+  if (externalBabelConfig) {
+    console.log(`> Found external babel configuration`)
+    const { options: { babelrc }} = externalBabelConfig
+    babelOptions.babelrc = babelrc !== false
+  } else {
+    babelOptions.babelrc = false
+  }
+
+  if (!babelOptions.babelrc) {
+    babelOptions.presets.push(require.resolve('./babel/preset'))
   }
 
   const config = {
@@ -66,7 +89,7 @@ const makeCompiler = async ({ production }) => {
             getSlidesFolder()
           ],
           use: [{
-            loader: 'bundle-loader',
+            loader: require.resolve('bundle-loader'),
             options: {
               lazy: true,
               name: '[name]'
@@ -94,22 +117,25 @@ const makeCompiler = async ({ production }) => {
             /node_modules/
           ],
           use: [!production && {
-            loader: 'react-hot-loader/webpack'
+            loader: require.resolve('react-hot-loader/webpack')
           }, {
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: resolvePaths(getTempFolder(), 'babel-cache')
-            }
+            loader: require.resolve('babel-loader'),
+            options: babelOptions
           }].filter(Boolean)
         }, {
           test: /\.json$/,
-          loader: 'json-loader'
+          loader: require.resolve('json-loader')
         }
       ].filter(Boolean)
     },
 
     resolve: {
-      extensions: ['.js', '.json']
+      extensions: ['.js', '.json'],
+      modules: [
+        resolve(__dirname, '../../node_modules/'),
+        'node_modules',
+        ...nodePathList
+      ]
     },
 
     plugins: [

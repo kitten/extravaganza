@@ -1,19 +1,33 @@
 import React, { Component } from 'react'
-import { Route } from 'react-router-dom'
+import { RouteTransition } from 'react-router-transition'
+import { Route, Redirect, Switch } from 'react-router-dom'
 
 import Container from './components/container'
 
 export const InnerApp = ({ slides }) => (
   <Container>
-    {
-      slides.map(({ component, routeName }, index) => (
-        <Route
-          key={routeName}
-          path={`/${index}`}
-          component={component}
-        />
-      ))
-    }
+    <Route render={({ location }) => (
+      <RouteTransition
+        pathname={location.pathname}
+        atEnter={{ opacity: 0 }}
+        atActive={{ opacity: 1 }}
+        atLeave={{ opacity: 0 }}
+      >
+        <Switch>
+          {
+            slides.map(({ component, routeName }, index) => (
+              <Route
+                key={routeName}
+                path={`/${index}`}
+                component={component}
+              />
+            ))
+          }
+
+          <Redirect to="/0" />
+        </Switch>
+      </RouteTransition>
+    )}/>
   </Container>
 )
 

@@ -14,7 +14,8 @@
     "lib",
     "package.json",
     ".editorconfig",
-    "yarn.lock"
+    "yarn.lock",
+    "babel.js"
   ],
   "repository": "https://github.com/philpl/extravaganza",
   "author": "Phil Plückthun <phil@plckthn.me> (https://github.com/philpl)",
@@ -45,9 +46,10 @@
     "preact-compat": "^3.16.0",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "react-hot-loader": "3.0.0-beta.7",
+    "react-hot-loader": "^3.0.0-beta.7",
     "react-loadable": "^3.3.1",
     "react-router-dom": "^4.1.1",
+    "react-router-transition": "^0.0.6",
     "styled-components": "^2.0.0-17",
     "webpack": "^2.5.1",
     "webpack-dev-middleware": "^1.10.2",

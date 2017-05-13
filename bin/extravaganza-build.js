@@ -4,9 +4,9 @@ const makeCompiler = require('../lib/webpack/compiler').default
 
 makeCompiler({ production: true }).then(compiler => {
   compiler.run((err, stats) => {
-    if (err) {
+    if (err || stats.hasErrors()) {
       console.log('> Extravaganza project failed to build')
-      console.error(err)
+      console.error(err || stats.toString('errors-only'))
       process.exit(1)
     } else {
       console.log('> Extravaganza project successfully built')

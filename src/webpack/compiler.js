@@ -9,6 +9,7 @@ import sort from 'alphanum-sort'
 import resolvePaths from '../utils/resolvePaths'
 import SlidePlugin from './plugins/slidePlugin'
 import WatchSlidePlugin from './plugins/watchSlidePlugin'
+import CombineAssetsPlugin from './plugins/combineAssetsPlugin'
 
 import {
   getContext,
@@ -58,12 +59,6 @@ const makeCompiler = async ({ production }) => {
     },
 
     module: {
-      // NOTE: The order here is very important (reverse order)
-      // 1. Create lazy bundle-loaders for slides
-      // 2. Compile entire app to dist/ folder for node.js
-      // 3. Transpile all js-files to ES5
-      // Please don't ask me how long it took to figure this out :'(
-
       rules: [
         {
           test: /\.js$/,
@@ -163,6 +158,10 @@ const makeCompiler = async ({ production }) => {
         },
         comments: false,
         sourceMap: false
+      }),
+      new CombineAssetsPlugin({
+        outputFile: 'app.js',
+        statsFile: join(getBuildFolder(true), 'stats.json')
       })
     ] : [
       new WatchSlidePlugin(getSlidesFolder()),

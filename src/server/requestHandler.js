@@ -5,9 +5,10 @@ import { StaticRouter } from 'react-router-dom'
 import { InnerApp } from '../client/app'
 import makePageTemplate from './pageTemplate'
 
-const requestHandler = (req, res, hotReloading) => {
-  const slideNames = hotReloading.getSlideNames()
-  const slides = hotReloading.getSlides()
+const requestHandler = (req, res, { build, production }) => {
+  const slides = build.getSlides()
+  const assetNames = ['manifest.js', 'commons.js']
+    .concat(build.getSlideNames(), ['main.js'])
 
   const app = renderToString(
     <StaticRouter location={req.url} context={{}}>
@@ -15,7 +16,7 @@ const requestHandler = (req, res, hotReloading) => {
     </StaticRouter>
   )
 
-  const html = makePageTemplate(app, slideNames)
+  const html = makePageTemplate(app, production ? ['app.js'] : assetNames)
 
   res.status(200).send(html)
 }

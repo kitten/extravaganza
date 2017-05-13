@@ -36,13 +36,8 @@ const makePageTemplate = (app, slides) => `
     <body>
       <div id="root">${app}</div>
 
-      <script type="text/javascript" src="/_extravaganza/webpack/manifest.js"></script>
-      <script type="text/javascript" src="/_extravaganza/webpack/commons.js"></script>
-
       ${pageBucketScript}
       ${pageSlideScripts(slides)}
-
-      <script type="text/javascript" src="/_extravaganza/webpack/main.js"></script>
     </body>
   </html>
 `

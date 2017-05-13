@@ -4,7 +4,6 @@ import { BrowserRouter } from 'react-router-dom'
 import { AppContainer } from 'react-hot-loader'
 
 import App from './app'
-import { notifyHot } from './hotMiddlewareClient'
 import SlideManager from './slideManager'
 
 const node = document.getElementById('root')

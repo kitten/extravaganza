@@ -1,19 +1,23 @@
-// Source: next.js
-// https://github.com/zeit/next.js/blob/dec85fe/server/build/plugins/combine-assets-plugin.js
+import sort from 'alphanum-sort'
 
-// This plugin combines a set of assets into a single asset
-// This should be only used with text assets,
-// otherwise the result is unpredictable.
 export default class CombineAssetsPlugin {
-  constructor ({ input, output }) {
-    this.input = input
-    this.output = output
+  constructor ({ outputFile, statsFile }) {
+    this.output = outputFile
+    this.stats = statsFile
   }
 
   apply (compiler) {
     compiler.plugin('after-compile', (compilation, callback) => {
+      const slides = sort(
+        Object
+          .keys(compilation.assets)
+          .filter(name => name.startsWith('slides/'))
+      )
+
+      const assets = ['manifest.js', 'commons.js'].concat(slides, 'main.js')
+
       let newSource = ''
-      this.input.forEach((name) => {
+      assets.forEach((name) => {
         const asset = compilation.assets[name]
         if (!asset) return
 
@@ -24,6 +28,12 @@ export default class CombineAssetsPlugin {
       compilation.assets[this.output] = {
         source: () => newSource,
         size: () => newSource.length
+      }
+
+      const assetsRaw = JSON.stringify(assets)
+      compilation.assets['stats.json'] = {
+        source: () => assetsRaw,
+        size: () => assetsRaw.length
       }
 
       callback()

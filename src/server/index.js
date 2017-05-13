@@ -1,36 +1,49 @@
 import express from 'express'
 import moduleAlias from 'module-alias'
 
+import BuildStats from './buildStats'
 import HotReloading from './hotReloading'
 import requestHandler from './requestHandler'
+import { getBuildFolder } from '../user/config'
 
-const isProd = process.env.NODE_ENV === 'production'
-
-const server = async () => {
+const server = async ({ production }) => {
   const app = express()
-
-  let hotReloading
-  if (!isProd) {
-    hotReloading = new HotReloading()
-    await hotReloading.start(app)
-  } else {
-    moduleAlias.addAlias('react', 'preact-compat')
-    moduleAlias.addAlias('react-dom', 'preact-compat')
-  }
 
   // Disable Express X-Powered-By header
   app.disable('x-powered-by')
 
-  app.get('*', hotReloading === undefined ?
-    (req, res) => res.end() :
-    (req, res) => requestHandler(req, res, hotReloading)
-  )
+  let build
+  if (!production) {
+    build = new HotReloading()
+    await build.start(app)
+  } else {
+    moduleAlias.addAlias('react', 'preact-compat')
+    moduleAlias.addAlias('react-dom', 'preact-compat')
+
+    build = new BuildStats()
+
+    app.use(
+      '/_extravaganza/webpack',
+      express.static(
+        getBuildFolder(true),
+        { etag: true }
+      )
+    )
+  }
+
+  app.get('*', (req, res) => {
+    requestHandler(req, res, { build, production })
+  })
 
   app.listen(3000, err => {
     if (err) {
-      console.error('> Unable to start the server!\n' + err.toString())
+      console.log('> Unable to start the server!')
+      console.error(err)
+      process.exit(1)
     }
+
+    console.error(`> Started a server listening on port ${3000}.`)
   })
 }
 
-server()
+export default server

@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { Route } from 'react-router-dom'
 
-const App = ({ slides }) => (
-  <div>
+import Container from './components/container'
+
+export const InnerApp = ({ slides }) => (
+  <Container>
     {
       slides.map(({ component, routeName }, index) => (
         <Route
@@ -12,10 +14,10 @@ const App = ({ slides }) => (
         />
       ))
     }
-  </div>
+  </Container>
 )
 
-export class SlideProvider extends Component {
+class App extends Component {
   componentWillMount() {
     const { slideManager } = this.props
 
@@ -29,8 +31,7 @@ export class SlideProvider extends Component {
   }
 
   render() {
-    const { slides } = this.state
-    return <App slides={slides} />
+    return <InnerApp slides={this.state.slides} />
   }
 }
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { renderToString } from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom'
 
-import App from '../client/app'
+import { InnerApp } from '../client/app'
 import makePageTemplate from './pageTemplate'
 
 const requestHandler = (req, res, hotReloading) => {
@@ -11,7 +11,7 @@ const requestHandler = (req, res, hotReloading) => {
 
   const app = renderToString(
     <StaticRouter location={req.url} context={{}}>
-      <App slides={slides} />
+      <InnerApp slides={slides} />
     </StaticRouter>
   )
 

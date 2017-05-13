@@ -37,6 +37,7 @@
     "react-hot-loader": "3.0.0-beta.7",
     "react-loadable": "^3.3.1",
     "react-router-dom": "^4.1.1",
+    "styled-components": "^2.0.0-17",
     "webpack": "^2.5.1",
     "webpack-dev-middleware": "^1.10.2",
     "webpack-hot-middleware": "^2.18.0",

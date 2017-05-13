@@ -3,14 +3,14 @@ import { render } from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 import { AppContainer } from 'react-hot-loader'
 
-import { SlideProvider } from './app'
+import App from './app'
 import { notifyHot } from './hotMiddlewareClient'
 import SlideManager from './slideManager'
 
 const node = document.getElementById('root')
 const mount = slideManager => render((
   <BrowserRouter>
-    <SlideProvider slideManager={slideManager} />
+    <App slideManager={slideManager} />
   </BrowserRouter>
 ), node)
 

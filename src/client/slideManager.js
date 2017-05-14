@@ -1,5 +1,5 @@
 import mitt from 'mitt'
-import { matchPath } from 'react-router-dom'
+import { matchPath, history } from 'react-router-dom'
 import Loadable from 'react-loadable'
 
 import Loading from './loading'
@@ -93,6 +93,22 @@ class SlideManager {
   subscribe(cb) {
     this.emitter.on('hotReload', cb)
     return () => this.emitter.off('hotReload', cb)
+  }
+
+  gotoNext(push) {
+    const index = this.slides.findIndex((_, index) => routeMatchesIndex(index))
+
+    if (index + 1 < this.slides.length) {
+      push(`/${index + 1}`)
+    }
+  }
+
+  gotoPrev(push) {
+    const index = this.slides.findIndex((_, index) => routeMatchesIndex(index))
+
+    if (index - 1 >= 0) {
+      push(`/${index - 1}`)
+    }
   }
 }
 

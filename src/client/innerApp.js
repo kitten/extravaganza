@@ -27,27 +27,30 @@ injectGlobal`
 
 export const InnerApp = ({ slides }) => (
   <ThemeProvider theme={theme}>
-    <SlideTransition
-      atEnter={atEnter}
-      atActive={atActive}
-      atLeave={atLeave}
-      Parent={Container}
-      Child={SlideContainer}
-    >
-      <Switch>
-        {
-          slides.map(({ component, routeName }, index) => (
-            <Route
-              key={routeName}
-              path={`/${index}`}
-              component={component}
-            />
-          ))
-        }
+    <Route render={({ location }) => (
+      <SlideTransition
+        pathname={location.pathname}
+        atEnter={atEnter}
+        atActive={atActive}
+        atLeave={atLeave}
+        Parent={Container}
+        Child={SlideContainer}
+      >
+        <Switch key={location.key} location={location}>
+          {
+            slides.map(({ component, routeName }, index) => (
+              <Route
+                key={routeName}
+                path={`/${index}`}
+                component={component}
+              />
+            ))
+          }
 
-        <Redirect to="/0" />
-      </Switch>
-    </SlideTransition>
+          <Redirect to="/0" />
+        </Switch>
+      </SlideTransition>
+    )} />
   </ThemeProvider>
 )
 

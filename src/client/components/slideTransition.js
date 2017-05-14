@@ -13,6 +13,7 @@ const ensureSpring = styles => Object
   }, {})
 
 const SlideTransition = ({
+  pathname,
   Parent,
   Child,
   children,
@@ -20,31 +21,29 @@ const SlideTransition = ({
   atActive,
   atLeave
 }) => (
-  <Route render={({ location: { pathname }}) => (
-    <TransitionMotion
-      styles={children ? [{
-        key: pathname,
-        data: children,
-        style: ensureSpring(atActive)
-      }] : []}
-      willEnter={() => atEnter}
-      willLeave={() => ensureSpring(atLeave)}
-    >
-      {
-        styles => (
-          <Parent>
-            {
-              styles.map(({ key, data, style }) => (
-                <Child key={key} style={style}>
-                  {data}
-                </Child>
-              ))
-            }
-          </Parent>
-        )
-      }
-    </TransitionMotion>
-  )}/>
+  <TransitionMotion
+    styles={children ? [{
+      key: pathname,
+      data: children,
+      style: ensureSpring(atActive)
+    }] : []}
+    willEnter={() => atEnter}
+    willLeave={() => ensureSpring(atLeave)}
+  >
+    {
+      styles => (
+        <Parent>
+          {
+            styles.map(({ key, data, style }) => (
+              <Child key={key} style={style}>
+                {data}
+              </Child>
+            ))
+          }
+        </Parent>
+      )
+    }
+  </TransitionMotion>
 )
 
 export default SlideTransition

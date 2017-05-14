@@ -1,6 +1,7 @@
 import './moduleAlias'
 
 import express from 'express'
+import compression from 'compression'
 import BuildStats from './buildStats'
 import HotReloading from './hotReloading'
 import requestHandler from './requestHandler'
@@ -10,8 +11,8 @@ import { getContext, getBuildFolder } from '../user/config'
 const server = async ({ production }) => {
   const app = express()
 
-  // Disable Express X-Powered-By header
   app.disable('x-powered-by')
+  app.use(compression())
 
   let build
   if (!production) {

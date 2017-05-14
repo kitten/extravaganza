@@ -100,6 +100,24 @@ const makeCompiler = async ({ production }) => {
               name: '[name]'
             }
           }]
+        }, !production && {
+          test: /\.js$/,
+          include: [
+            getContext(),
+            getSlidesFolder()
+          ],
+          exclude: [
+            /node_modules/,
+            getTempFolder()
+          ],
+          loader: require.resolve('./loaders/hotAcceptLoader')
+        }, {
+          test: /\.json$/,
+          exclude: [
+            getTempFolder(),
+            /node_modules/
+          ],
+          loader: require.resolve('json-loader')
         }, {
           test: /\.(js|json)$/,
           include: [
@@ -110,11 +128,7 @@ const makeCompiler = async ({ production }) => {
             /node_modules/,
             getTempFolder()
           ],
-          use: [{
-            loader: require.resolve('./loaders/emitFileLoader')
-          }, !production && {
-            loader: require.resolve('./loaders/hotAcceptLoader')
-          }].filter(Boolean)
+          loader: require.resolve('./loaders/emitFileLoader')
         }, {
           test: /\.js$/,
           exclude: [
@@ -127,9 +141,6 @@ const makeCompiler = async ({ production }) => {
             loader: require.resolve('babel-loader'),
             options: babelOptions
           }].filter(Boolean)
-        }, {
-          test: /\.json$/,
-          loader: require.resolve('json-loader')
         }
       ].filter(Boolean)
     },

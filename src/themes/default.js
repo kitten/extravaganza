@@ -4,7 +4,8 @@ module.exports = {
     weights: [400, 600]
   },
   colors: {
-    background: '#203040',
-    foreground: '#FFFFFF'
+    background: '#FCF8F3',
+    primary: '#DB7093',
+    secondary: '#F3B661'
   }
 }

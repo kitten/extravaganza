@@ -6,6 +6,11 @@
     "react"
   ],
   "plugins": [
+    ["babel-plugin-styled-components", {
+      ssr: true,
+      minify: true
+    }],
+
     "transform-object-rest-spread",
     "transform-class-properties",
     "transform-runtime"

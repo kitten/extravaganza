@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import base from './base'
 
 const Container = styled.div`
+  ${base};
+
   display: block;
   width: 100%;
   height: ${p => p.cssHeight}px;
@@ -16,7 +18,6 @@ const Text = styled.span`
   line-height: ${p => p.lineHeight || 1};
   transform: scale(${p => p.scale});
   transform-origin: center top;
-  ${base}
 `
 
 class TextFit extends Component {
@@ -60,11 +61,11 @@ class TextFit extends Component {
         style={style}
         innerRef={c => { this.containerRef = c }}
         cssHeight={height}
+        {...props}
       >
         <Text
           innerRef={t => { this.textRef = t }}
           scale={scale}
-          {...props}
         >
           {children}
         </Text>

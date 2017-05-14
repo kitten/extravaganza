@@ -28,10 +28,7 @@ export const getTempFolder = () => resolvePaths(
 )
 
 export const getBuildFolder = production => !production ?
-  resolvePaths(
-    getTempFolder(),
-    'webpack/'
-  ) :
+  getTempFolder() :
   resolvePaths(
     getContext(),
     getConfig().distDir || 'build/'

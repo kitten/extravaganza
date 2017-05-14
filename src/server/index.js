@@ -24,7 +24,7 @@ const server = async ({ production }) => {
     build = new BuildStats()
 
     app.use(
-      '/_extravaganza/webpack',
+      '/_extravaganza',
       express.static(
         getBuildFolder(true),
         { etag: true }

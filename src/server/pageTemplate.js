@@ -10,7 +10,7 @@ const pageBucketScript = `window.__SLIDE_LOADERS__ = {};window.__REGISTER_SLIDE_
 
 const pageSlideScripts = slides => slides
   .map(slideRoute => `
-    <script type="text/javascript" src="/_extravaganza/webpack/${slideRoute}"></script>
+    <script type="text/javascript" src="/_extravaganza/${slideRoute}"></script>
   `)
   .join('')
 

@@ -76,8 +76,8 @@ const makeCompiler = async ({ production }) => {
     output: {
       path: getBuildFolder(production),
       filename: '[name]',
-      chunkFilename: '[id]-slide.js',
-      publicPath: '/_extravaganza/webpack/',
+      chunkFilename: 'chunk/[name].js',
+      publicPath: '/_extravaganza/',
       strictModuleExceptionHandling: true
     },
 
@@ -169,6 +169,7 @@ const makeCompiler = async ({ production }) => {
       }),
 
       new WriteFilePlugin({
+        test: /(\.hot-update){0}\.js(on)?$/,
         exitOnErrors: false,
         log: false,
         useHashIndex: false

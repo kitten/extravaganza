@@ -57,7 +57,7 @@ class HotReloading {
     })
 
     this.devMiddleware = webpackDevMiddleware(this.compiler, {
-      publicPath: '/_extravaganza/webpack/',
+      publicPath: '/_extravaganza/',
       quiet: true,
       noInfo: true
     })

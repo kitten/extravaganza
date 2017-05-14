@@ -4,6 +4,7 @@ import glob from 'glob-promise'
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin'
 import WriteFilePlugin from 'write-file-webpack-plugin'
+import PrecacheWebpackPlugin from 'sw-precache-webpack-plugin'
 import sort from 'alphanum-sort'
 import rimraf from 'rimraf'
 
@@ -189,6 +190,21 @@ const makeCompiler = async ({ production }) => {
         comments: false,
         sourceMap: false
       }),
+      new PrecacheWebpackPlugin({
+        filename: 'sw.js',
+        minify: true,
+        forceDelete: true,
+        runtimeCaching: [
+          {
+            handler: 'fastest',
+            urlPattern: /[.](png|jpg|css)/
+          },
+          {
+            handler: 'networkFirst',
+            urlPattern: /^http.*/
+          }
+        ]
+      }),
       new CombineAssetsPlugin({
         outputFile: 'app.js',
         statsFile: join(getBuildFolder(true), 'stats.json')
@@ -205,8 +221,8 @@ const makeCompiler = async ({ production }) => {
 
   if (production) {
     config.resolve.alias = {
-      'react': 'preact-compat/dist/preact-compat',
-      'react-dom': 'preact-compat/dist/preact-compat'
+      'react': require.resolve('preact-compat/dist/preact-compat'),
+      'react-dom': require.resolve('preact-compat/dist/preact-compat')
     }
   }
 

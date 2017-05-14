@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+process.env.NODE_ENV = 'production'
+
 const makeCompiler = require('../lib/webpack/compiler').default
 
 makeCompiler({ production: true }).then(compiler => {

@@ -1,6 +1,6 @@
-import express from 'express'
-import moduleAlias from 'module-alias'
+import './moduleAlias'
 
+import express from 'express'
 import BuildStats from './buildStats'
 import HotReloading from './hotReloading'
 import requestHandler from './requestHandler'
@@ -18,9 +18,6 @@ const server = async ({ production }) => {
     build = new HotReloading()
     await build.start(app)
   } else {
-    moduleAlias.addAlias('react', require.resolve('preact-compat'))
-    moduleAlias.addAlias('react-dom', require.resolve('preact-compat'))
-
     build = new BuildStats()
 
     app.use(
@@ -30,6 +27,13 @@ const server = async ({ production }) => {
         { etag: true }
       )
     )
+
+    app.get('/sw.js', (req, res) => {
+      res.sendFile(resolvePaths(
+        getBuildFolder(true),
+        'sw.js'
+      ))
+    })
   }
 
   app.use(

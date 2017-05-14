@@ -3,7 +3,7 @@ import TransitionMotion from 'react-motion/lib/TransitionMotion'
 import { Route } from 'react-router-dom'
 import spring from 'react-motion/lib/spring'
 
-const gentle = { stiffness: 120, damping: 14 }
+const gentle = { stiffness: 90, damping: 20 }
 const ensureSpring = styles => Object
   .keys(styles)
   .reduce((acc, key) => {

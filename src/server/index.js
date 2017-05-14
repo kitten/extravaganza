@@ -4,7 +4,8 @@ import moduleAlias from 'module-alias'
 import BuildStats from './buildStats'
 import HotReloading from './hotReloading'
 import requestHandler from './requestHandler'
-import { getBuildFolder } from '../user/config'
+import resolvePaths from '../utils/resolvePaths'
+import { getContext, getBuildFolder } from '../user/config'
 
 const server = async ({ production }) => {
   const app = express()
@@ -30,6 +31,15 @@ const server = async ({ production }) => {
       )
     )
   }
+
+  app.use(
+    '/static',
+    express.static(
+      resolvePaths(getContext(), 'static/'),
+      { etag: true }
+    )
+  )
+
 
   app.get('*', (req, res) => {
     requestHandler(req, res, { build, production })

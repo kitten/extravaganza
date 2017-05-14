@@ -12,6 +12,7 @@
   "files": [
     "bin",
     "lib",
+    "assets",
     "package.json",
     ".editorconfig",
     "yarn.lock",

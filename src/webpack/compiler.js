@@ -18,7 +18,8 @@ import {
   getContext,
   getBuildFolder,
   getTempFolder,
-  getSlidesFolder
+  getSlidesFolder,
+  getThemePath
 } from '../user/config'
 
 const nodePathList = (process.env.NODE_PATH || '')
@@ -134,6 +135,9 @@ const makeCompiler = async ({ production }) => {
     },
 
     resolve: {
+      alias: {
+        'extravaganza/theme': getThemePath()
+      },
       extensions: ['.js', '.json'],
       modules: [
         resolve(__dirname, '../../node_modules/'),
@@ -220,10 +224,8 @@ const makeCompiler = async ({ production }) => {
   }
 
   if (production) {
-    config.resolve.alias = {
-      'react': require.resolve('preact-compat/dist/preact-compat'),
-      'react-dom': require.resolve('preact-compat/dist/preact-compat')
-    }
+    config.resolve.alias.react = require.resolve('preact-compat/dist/preact-compat')
+    config.resolve.alias['react-dom'] = require.resolve('preact-compat/dist/preact-compat')
   }
 
   await rm(getBuildFolder(production))

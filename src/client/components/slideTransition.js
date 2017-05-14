@@ -3,11 +3,12 @@ import TransitionMotion from 'react-motion/lib/TransitionMotion'
 import { Route } from 'react-router-dom'
 import spring from 'react-motion/lib/spring'
 
+const gentle = { stiffness: 120, damping: 14 }
 const ensureSpring = styles => Object
   .keys(styles)
   .reduce((acc, key) => {
     const value = styles[key]
-    acc[key] = typeof value === 'number' ? spring(value) : value
+    acc[key] = typeof value === 'number' ? spring(value, gentle) : value
     return acc
   }, {})
 
@@ -21,7 +22,6 @@ const SlideTransition = ({
 }) => (
   <Route render={({ location: { pathname }}) => (
     <TransitionMotion
-      defaultStyles={[]}
       styles={children ? [{
         key: pathname,
         data: children,

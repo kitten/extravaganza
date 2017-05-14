@@ -14,21 +14,38 @@ const pageSlideScripts = slides => slides
   `)
   .join('')
 
-const makePageTemplate = (app, slides) => `
+const makePageTemplate = (html, css, slides) => `
+  <html>
+    <head>
+      <meta httpequiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <style type="text/css">${sanitizeCSS}</style>
+      ${css}
+
+      <title>Extravaganza Slides</title>
+    </head>
+
+    <body>
+      <div id="root">${html}</div>
+
+      <script>${pageBucketScript}</script>
+      ${pageSlideScripts(slides)}
+    </body>
+  </html>
+`
+
+export const makeErrorTemplate = html => `
   <html>
     <head>
       <meta httpequiv="X-UA-Compatible" content="IE=edge,chrome=1" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <style type="text/css">${sanitizeCSS}</style>
 
-      <title>Extravaganza Slides</title>
+      <title>Extravaganza Slides: Error</title>
     </head>
 
     <body>
-      <div id="root">${app}</div>
-
-      <script>${pageBucketScript}</script>
-      ${pageSlideScripts(slides)}
+      <div id="root">${html}</div>
     </body>
   </html>
 `

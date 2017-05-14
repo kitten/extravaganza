@@ -38,3 +38,10 @@ export const getSlidesFolder = () => resolvePaths(
   getContext(),
   'slides/'
 )
+
+export const getThemePath = () => (
+  resolvePaths(
+    getContext(),
+    getConfig().themePath || require.resolve('../themes/default')
+  )
+)

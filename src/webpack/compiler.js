@@ -5,6 +5,7 @@ import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin'
 import WriteFilePlugin from 'write-file-webpack-plugin'
 import sort from 'alphanum-sort'
+import rimraf from 'rimraf'
 
 import resolvePaths from '../utils/resolvePaths'
 import SlidePlugin from './plugins/slidePlugin'
@@ -22,6 +23,8 @@ import {
 const nodePathList = (process.env.NODE_PATH || '')
   .split(process.platform === 'win32' ? ';' : ':')
   .filter(Boolean)
+
+const rm = dir => new Promise(resolve => rimraf(dir, resolve))
 
 const makeCompiler = async ({ production }) => {
   const makeEntry = async () => {
@@ -206,6 +209,8 @@ const makeCompiler = async ({ production }) => {
       'react-dom': 'preact-compat/dist/preact-compat'
     }
   }
+
+  await rm(getBuildFolder(production))
 
   return webpack(config)
 }

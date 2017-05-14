@@ -5,7 +5,7 @@ import base from './base'
 const Container = styled.div`
   display: block;
   width: 100%;
-  height: ${p => p.height}px;
+  height: ${p => p.cssHeight}px;
 `
 
 const Text = styled.span`
@@ -13,7 +13,7 @@ const Text = styled.span`
   font-size: 16px;
   margin: 0;
   padding: 0;
-  line-height: ${p => p.lineHeight};
+  line-height: ${p => p.lineHeight || 1};
   transform: scale(${p => p.scale});
   transform-origin: center top;
   ${base}
@@ -47,7 +47,7 @@ class TextFit extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('load', this.resize)
-    window.removeEventListene('resize', this.resize)
+    window.removeEventListener('resize', this.resize)
   }
 
   render() {
@@ -59,7 +59,7 @@ class TextFit extends Component {
         className={className}
         style={style}
         innerRef={c => { this.containerRef = c }}
-        height={height}
+        cssHeight={height}
       >
         <Text
           innerRef={t => { this.textRef = t }}

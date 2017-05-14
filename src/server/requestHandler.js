@@ -26,7 +26,9 @@ const requestHandler = (req, res, { build, production }) => {
     const html = makePageTemplate(app, css, production ? ['app.js'] : assetNames)
 
     res.status(200).send(html)
-  } catch(err) {
+  } catch (err) {
+    console.error(err)
+
     const app = renderToString(<RedBox error={err} />)
     const html = makeErrorTemplate(app)
 

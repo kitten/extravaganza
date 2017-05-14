@@ -1,7 +1,7 @@
 module.exports = {
   googleFont: {
-    name: 'Lato',
-    weights: [400, 700]
+    name: 'Montserrat',
+    weights: [400, 600]
   },
   colors: {
     background: '#203040',

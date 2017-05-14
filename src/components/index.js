@@ -1,2 +1,5 @@
 import Slide from './Slide'
-export { Slide }
+import Text from './Text'
+import TextFit from './TextFit'
+
+export { Slide, Text, TextFit }

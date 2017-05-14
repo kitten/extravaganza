@@ -31,7 +31,7 @@ export default class CombineAssetsPlugin {
       }
 
       const assetsRaw = JSON.stringify(assets)
-      compilation.assets['stats.json'] = {
+      compilation.assets['assets.json'] = {
         source: () => assetsRaw,
         size: () => assetsRaw.length
       }

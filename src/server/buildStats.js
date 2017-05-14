@@ -7,7 +7,7 @@ import filterSlideChunks from '../utils/filterSlideChunks'
 
 class BuildStats {
   constructor() {
-    const requirePath = resolvePaths(getBuildFolder(true), 'stats.json')
+    const requirePath = resolvePaths(getBuildFolder(true), 'assets.json')
     this.stats = require(requirePath)
   }
 

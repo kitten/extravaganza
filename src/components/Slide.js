@@ -13,11 +13,11 @@ const Outer = styled.div`
   display: flex;
   overflow: hidden;
 
+  ${base}
+
   background: ${(
     p => p.background || p.theme.colors.background
   )};
-
-  ${base}
 `
 
 const Inner = styled.div`

@@ -47,7 +47,7 @@ class HotReloading {
       if (this.success) {
         // Collect changes and send to client via hotMiddleware.publish
         this.hotMiddleware.publish({
-          chunks: filterSlideChunks(chunks).map(x => x.name),
+          chunks: filterSlideChunks(chunks.map(x => x.name)),
           action: 'changed'
         })
       }
@@ -89,8 +89,7 @@ class HotReloading {
 
   getSlideNames() {
     return sort(
-      filterSlideChunks(this.getChunks())
-        .map(({ name }) => name)
+      filterSlideChunks(this.getChunks().map(({ name }) => name))
     )
   }
 

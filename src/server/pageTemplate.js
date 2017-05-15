@@ -23,6 +23,7 @@ const makePageTemplate = (html, css, slides) => `
       ${css}
 
       <title>Extravaganza Slides</title>
+      <link rel="icon" type="image/png" href="/static/favicon.png" />
     </head>
 
     <body>

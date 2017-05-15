@@ -12,8 +12,19 @@ const routeMatchesIndex = index => matchPath(
   window.location.pathname, { path: `/${index}` }
 ) !== null
 
+const preload = (slideLoaders, index) => {
+  if (index >= slideLoaders.length || index < 0) {
+    return
+  }
+
+  const { isLoaded, loader } = slideLoaders[index]
+  if (!isLoaded) {
+    loader()
+  }
+}
+
 class SlideManager {
-  constructor(slideLoaders, slides = []) {
+  constructor(slideLoaders = [], slides = []) {
     this.slideLoaders = slideLoaders
     this.slides = slides
     this.emitter = mitt()
@@ -25,7 +36,7 @@ class SlideManager {
       .map((routeName, index) => {
         const { slideLoader } = _slideLoaders[routeName]()
 
-        const entry = { routeName }
+        const entry = { routeName, isLoaded: false }
         entry.loader = () => new Promise(resolve => {
           slideLoader(component => {
             entry.isLoaded = true
@@ -38,11 +49,15 @@ class SlideManager {
 
     const slides = await Promise.all(
       slideLoaders.map(async ({ routeName, loader }, index) => {
-
         let component
         if (routeMatchesIndex(index)) {
           // Preload slide if it's active
           component = (await loader()).default
+
+          setTimeout(() => {
+            preload(slideLoaders, index - 1)
+            preload(slideLoaders, index + 1)
+          })
         } else {
           component = Loadable({
             loader,
@@ -95,19 +110,27 @@ class SlideManager {
     return () => this.emitter.off('hotReload', cb)
   }
 
+  preload(index) {
+    preload(this.slideLoaders, index)
+  }
+
   gotoNext(push) {
     const index = this.slides.findIndex((_, index) => routeMatchesIndex(index))
+    const nextIndex = index + 1
 
-    if (index + 1 < this.slides.length) {
-      push(`/${index + 1}`)
+    if (nextIndex < this.slides.length) {
+      push(`/${nextIndex}`)
+      this.preload(nextIndex + 1)
     }
   }
 
   gotoPrev(push) {
     const index = this.slides.findIndex((_, index) => routeMatchesIndex(index))
+    const nextIndex = index - 1
 
-    if (index - 1 >= 0) {
-      push(`/${index - 1}`)
+    if (nextIndex >= 0) {
+      push(`/${nextIndex}`)
+      this.preload(nextIndex - 1)
     }
   }
 }

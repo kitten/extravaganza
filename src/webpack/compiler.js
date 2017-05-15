@@ -81,7 +81,7 @@ const makeCompiler = async ({ production }) => {
     output: {
       path: getBuildFolder(production),
       filename: '[name]',
-      chunkFilename: 'chunk/[name].js',
+      chunkFilename: 'chunk/[chunkhash]-[name].js',
       publicPath: '/_extravaganza/',
       strictModuleExceptionHandling: true
     },

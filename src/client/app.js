@@ -22,17 +22,24 @@ class App extends Component {
     }
   }
 
+  updateSlide = evt => {
+    const push = this.props.history.push
+    this.props.slideManager.updateState(evt, push)
+  }
+
   componentDidMount() {
     this.unsubscribe = this.props.slideManager.subscribe(slides => {
       this.forceUpdate()
     })
 
     window.addEventListener('keydown', this.handleKey)
+    window.addEventListener('storage', this.updateSlide)
   }
 
   componentWillUnmount() {
     this.unsubscribe()
     window.removeEventListener('keydown', this.handleKey)
+    window.removeEventListener('storage', this.updateSlide)
   }
 
   render() {

@@ -23,6 +23,14 @@ const preload = (slideLoaders, index) => {
   }
 }
 
+const LOCALSTORAGE_KEY = 'extravaganza-state'
+
+const storeState = index => (
+  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({
+    slide: index
+  }))
+)
+
 class SlideManager {
   constructor(slideLoaders = [], slides = []) {
     this.slideLoaders = slideLoaders
@@ -55,6 +63,7 @@ class SlideManager {
           component = (await loader()).default
 
           setTimeout(() => {
+            storeState(index)
             preload(slideLoaders, index - 1)
             preload(slideLoaders, index + 1)
           })
@@ -114,23 +123,46 @@ class SlideManager {
     preload(this.slideLoaders, index)
   }
 
-  gotoNext(push) {
+  getActiveSlide() {
     const index = this.slides.findIndex((_, index) => routeMatchesIndex(index))
+    return index
+  }
+
+  gotoNext(push) {
+    const index = this.getActiveSlide()
     const nextIndex = index + 1
 
     if (nextIndex < this.slides.length) {
       push(`/${nextIndex}`)
       this.preload(nextIndex + 1)
+      storeState(nextIndex)
     }
   }
 
   gotoPrev(push) {
-    const index = this.slides.findIndex((_, index) => routeMatchesIndex(index))
+    const index = this.getActiveSlide()
     const nextIndex = index - 1
 
     if (nextIndex >= 0) {
       push(`/${nextIndex}`)
       this.preload(nextIndex - 1)
+      storeState(nextIndex)
+    }
+  }
+
+  updateState({ key, newValue }, push) {
+    if (key === LOCALSTORAGE_KEY) {
+      const { slide } = JSON.parse(newValue)
+      const index = this.getActiveSlide()
+
+      if (
+        typeof slide === 'number' &&
+        slide >= 0 &&
+        slide < this.slides.length &&
+        slide !== index
+      ) {
+        push(`/${slide}`)
+      }
     }
   }
 }

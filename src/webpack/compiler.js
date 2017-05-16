@@ -1,6 +1,7 @@
 import { join, relative, resolve } from 'path'
 import webpack from 'webpack'
 import glob from 'glob-promise'
+import HappyPack from 'happypack'
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin'
 import WriteFilePlugin from 'write-file-webpack-plugin'
@@ -138,8 +139,8 @@ const makeCompiler = async ({ production }) => {
           use: [!production && {
             loader: require.resolve('react-hot-loader/webpack')
           }, {
-            loader: require.resolve('babel-loader'),
-            options: babelOptions
+            loader: require.resolve('happypack/loader'),
+            query: { id: 'babel' }
           }].filter(Boolean)
         }
       ].filter(Boolean)
@@ -158,6 +159,18 @@ const makeCompiler = async ({ production }) => {
     },
 
     plugins: [
+      new HappyPack({
+        id: 'babel',
+        tempDir: join(getTempFolder(), '.happypack/'),
+        loaders: [
+          {
+            path: require.resolve('babel-loader'),
+            query: babelOptions
+          }
+        ],
+        verbose: false
+      }),
+
       new webpack.LoaderOptionsPlugin({
         minimize: production
       }),

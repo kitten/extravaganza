@@ -1,6 +1,6 @@
 {
   "name": "extravaganza",
-  "version": "0.1.0",
+  "version": "1.0.0-0",
   "description": "Framework for React-powered presentations",
   "main": "index.js",
   "bin": {
@@ -13,11 +13,15 @@
   "files": [
     "bin",
     "lib",
+    "src",
     "assets",
     "package.json",
     ".editorconfig",
     "yarn.lock",
-    "babel.js"
+    "index.js",
+    "babel.js",
+    "theme.js",
+    "themes.js"
   ],
   "repository": "https://github.com/philpl/extravaganza",
   "author": "Phil Plückthun <phil@plckthn.me> (https://github.com/philpl)",

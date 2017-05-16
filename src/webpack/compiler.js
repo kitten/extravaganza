@@ -77,7 +77,7 @@ const makeCompiler = async ({ production }) => {
   const config = {
     context: getContext(),
     devtool: production ? false : 'cheap-module-inline-source-map',
-    entry: makeEntry,
+    entry: production ? await makeEntry() : makeEntry,
 
     output: {
       path: getBuildFolder(production),
@@ -171,10 +171,6 @@ const makeCompiler = async ({ production }) => {
         verbose: false
       }),
 
-      new webpack.LoaderOptionsPlugin({
-        minimize: production
-      }),
-
       new webpack.optimize.CommonsChunkPlugin({
         name: 'commons',
         filename: 'commons.js',
@@ -210,14 +206,6 @@ const makeCompiler = async ({ production }) => {
       new SlidePlugin(production),
       new CaseSensitivePathsPlugin()
     ].concat(production ? [
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          screw_ie8: true,
-          warnings: false
-        },
-        comments: false,
-        sourceMap: false
-      }),
       new PrecacheWebpackPlugin({
         filename: 'sw.js',
         minify: true,

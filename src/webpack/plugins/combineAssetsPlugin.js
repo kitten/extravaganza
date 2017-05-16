@@ -1,4 +1,5 @@
 import sort from 'alphanum-sort'
+import { minify } from 'uglify-js'
 
 export default class CombineAssetsPlugin {
   constructor ({ outputFile, statsFile }) {
@@ -25,9 +26,13 @@ export default class CombineAssetsPlugin {
         delete compilation.assets[name]
       })
 
+      const minified = minify(newSource, {
+        warnings: false
+      })
+
       compilation.assets[this.output] = {
-        source: () => newSource,
-        size: () => newSource.length
+        source: () => minified.code,
+        size: () => minified.code.length
       }
 
       const assetsRaw = JSON.stringify(assets)

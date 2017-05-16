@@ -81,7 +81,7 @@ const Title = styled.div`
   color: #fff;
 
   display: block;
-  font-size: 1.15vw;
+  font-size: 0.8rem;
   padding: 0 0.4rem;
   text-transform: uppercase;
 

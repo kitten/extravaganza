@@ -5,6 +5,7 @@ import TextFit from './TextFit'
 import Image from './Image'
 import View from './View'
 import CodeBlock from './CodeBlock'
+import List from './List'
 
 export {
   Slide,
@@ -13,5 +14,6 @@ export {
   TextFit,
   Image,
   View,
-  CodeBlock
+  CodeBlock,
+  List
 }

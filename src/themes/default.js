@@ -1,3 +1,6 @@
+import prismLight from './prism/light'
+import prismDark from './prism/dark'
+
 module.exports = {
   googleFont: {
     name: 'Montserrat',
@@ -7,5 +10,7 @@ module.exports = {
     background: '#FCF8F3',
     primary: '#DB7093',
     secondary: '#F3B661'
-  }
+  },
+  codeBlockTheme: prismLight,
+  playgroundTheme: prismDark
 }

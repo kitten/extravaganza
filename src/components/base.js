@@ -9,6 +9,7 @@ const base = css`
   text-transform: ${p => p.caps ? 'uppercase': 'none'};
   color: ${p => p.textColor ? ensureColour(p.textColor) : 'inherit'};
   font-size: ${p => p.textSize ? ensureUnit(p.textSize) : 'inherit'};
+  border: ${p => p.border || 'none'};
 
   margin: ${p => p.margin ? ensureUnit(p.margin) : 0};
   padding: ${p => p.padding ? ensureUnit(p.padding) : 0};

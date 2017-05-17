@@ -12,13 +12,25 @@ class App extends Component {
   }
 
   handleKey = ({ keyCode }) => {
-    const push = this.props.history.push
+    const { push } = this.props.history
 
-    let index
     if (nextSlideKeys.includes(keyCode)) {
-      index = this.props.slideManager.gotoNext(push)
+      this.props.slideManager.gotoNext(push)
     } else if (prevSlideKeys.includes(keyCode)) {
-      index = this.props.slideManager.gotoPrev(push)
+      this.props.slideManager.gotoPrev(push)
+    }
+  }
+
+  handleTouch = ({ touches }) => {
+    const { push } = this.props.history
+
+    if (touches.length === 1) {
+      const { clientX } = touches[0]
+      if (clientX >= window.innerWidth / 2) {
+        this.props.slideManager.gotoNext(push)
+      } else {
+        this.props.slideManager.gotoPrev(push)
+      }
     }
   }
 
@@ -33,12 +45,15 @@ class App extends Component {
     })
 
     window.addEventListener('keydown', this.handleKey)
+    window.addEventListener('touchstart', this.handleTouch)
     window.addEventListener('storage', this.updateSlide)
   }
 
   componentWillUnmount() {
     this.unsubscribe()
+
     window.removeEventListener('keydown', this.handleKey)
+    window.removeEventListener('touchstart', this.handleTouch)
     window.removeEventListener('storage', this.updateSlide)
   }
 

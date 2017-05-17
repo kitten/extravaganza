@@ -180,10 +180,16 @@ const makeCompiler = async ({ production }) => {
       new PrecacheWebpackPlugin({
         filename: 'sw.js',
         minify: true,
-        forceDelete: true,
-        mergeStaticsConfig: true,
-        staticFileGlobs: join(getContext(), 'static/**/*'),
-        staticFileGlobsIgnorePatterns: [/\.map$/],
+        runtimeCaching: [
+          {
+            handler: 'fastest',
+            urlPattern: /[.](png|jpg|gif|css|woff|woff2|ttf|otf)/
+          },
+          {
+            handler: 'networkFirst',
+            urlPattern: /^http.*/
+          }
+        ],
         logger: () => {}
       }),
 

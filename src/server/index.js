@@ -6,6 +6,7 @@ import BuildStats from './buildStats'
 import HotReloading from './hotReloading'
 import requestHandler from './requestHandler'
 import resolvePaths from '../utils/resolvePaths'
+import emptyServiceWorker from './utils/emptyServiceWorker'
 import { getContext, getBuildFolder } from '../user/config'
 
 const server = async ({ production }) => {
@@ -18,6 +19,13 @@ const server = async ({ production }) => {
   if (!production) {
     build = new HotReloading()
     await build.start(app)
+
+    app.get('/sw.js', (req, res) => {
+      res
+        .status(200)
+        .type('application/javascript')
+        .send(emptyServiceWorker)
+    })
   } else {
     build = new BuildStats()
 
@@ -44,7 +52,6 @@ const server = async ({ production }) => {
       { etag: true }
     )
   )
-
 
   app.get('*', (req, res) => {
     requestHandler(req, res, { build, production })

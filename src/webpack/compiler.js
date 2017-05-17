@@ -181,16 +181,9 @@ const makeCompiler = async ({ production }) => {
         filename: 'sw.js',
         minify: true,
         forceDelete: true,
-        runtimeCaching: [
-          {
-            handler: 'fastest',
-            urlPattern: /[.](png|jpg|css)/
-          },
-          {
-            handler: 'networkFirst',
-            urlPattern: /^http.*/
-          }
-        ]
+        mergeStaticsConfig: true,
+        staticFileGlobs: join(getContext(), 'static/**/*'),
+        staticFileGlobsIgnorePatterns: [/\.map$/]
       }),
 
       new CombineAssetsPlugin(['manifest.js', 'commons.js', 'main.js'], 'app.js'),

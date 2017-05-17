@@ -12,8 +12,11 @@ const devAssets = ['manifest.js', 'commons.js', 'main.js']
 
 const requestHandler = (req, res, { build, production }) => {
   try {
+    const assets = production ? prodAssets : devAssets
+    const slideNames = build.getSlideNames()
     const slides = build.getSlides()
     const sheet = new ServerStyleSheet()
+
     const app = renderToString(
       sheet.collectStyles(
         <StaticRouter location={req.url} context={{}}>
@@ -23,7 +26,13 @@ const requestHandler = (req, res, { build, production }) => {
     )
 
     const css = sheet.getStyleTags()
-    const html = makePageTemplate(app, css, production ? prodAssets : devAssets)
+
+    const html = makePageTemplate(
+      app,
+      css,
+      assets,
+      slideNames
+    )
 
     res.status(200).send(html)
   } catch (err) {

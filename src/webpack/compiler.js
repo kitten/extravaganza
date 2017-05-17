@@ -10,11 +10,11 @@ import rimraf from 'rimraf'
 import mkdirp from 'mkdirp-promise'
 
 import resolvePaths from '../utils/resolvePaths'
-import WatchSlidePlugin from './plugins/watchSlidePlugin'
+import SlidesPlugin from './plugins/slidesPlugin'
+import WatchSlidesPlugin from './plugins/watchSlidesPlugin'
 import CombineAssetsPlugin from './plugins/combineAssetsPlugin'
-import SaveSlidesMetaPlugin from './plugins/saveSlidesMetaPlugin'
-import SuppressEntryChunksPlugin from './plugins/suppressEntryChunksPlugin'
 import findBabelConfig from './babel/findConfig'
+import findSlides from './utils/findSlides'
 
 import {
   getContext,
@@ -32,7 +32,7 @@ const nodePathList = (process.env.NODE_PATH || '')
 const rm = dir => new Promise(resolve => rimraf(dir, resolve))
 
 const makeCompiler = async ({ production }) => {
-  const entry = {
+  const baseEntry = {
     'main.js': [
       !production && require.resolve('../client/hotMiddlewareClient'),
       !production && require.resolve('react-hot-loader/patch'),
@@ -40,12 +40,24 @@ const makeCompiler = async ({ production }) => {
     ].filter(Boolean)
   }
 
-  const slides = await glob('**/*.js', { cwd: getSlidesFolder() })
-  const slideEntrypoints = slides.map(x => `slides/${x}`)
+  const makeEntry = async () => {
+    const entry = Object.assign({}, baseEntry)
+    const slides = await findSlides()
 
-  slideEntrypoints.forEach(slide => {
-    entry[slide] = [ resolvePaths(getContext(), `./${slide}`) ]
-  })
+    slides.forEach(slide => {
+      entry[slide] = [ resolvePaths(getContext(), slide) ]
+    })
+
+    return entry
+  }
+
+  let minChunks
+  if (production) {
+    const noSlides = (await findSlides()).length
+    minChunks = (_, count) => count >= noSlides / 4
+  } else {
+    minChunks = module => module.context && module.context.includes('node_modules')
+  }
 
   const babelOptions = {
     cacheDirectory: true,
@@ -68,30 +80,19 @@ const makeCompiler = async ({ production }) => {
   const config = {
     context: getContext(),
     devtool: production ? false : 'cheap-module-inline-source-map',
-    entry,
+    entry: production ? await makeEntry() : makeEntry,
 
     output: {
       path: getBuildFolder(production),
       filename: '[name]',
-      chunkFilename: 'chunk/[chunkhash]-[name].js',
+      chunkFilename: 'chunk/[name].js',
       publicPath: '/_extravaganza/',
       strictModuleExceptionHandling: true
     },
 
     module: {
       rules: [
-        !production && {
-          test: /\.js$/,
-          include: [
-            getContext(),
-            getSlidesFolder()
-          ],
-          exclude: [
-            /node_modules/,
-            getTempFolder()
-          ],
-          loader: require.resolve('./loaders/hotAcceptLoader')
-        }, {
+        {
           test: /\.json$/,
           exclude: [
             getTempFolder(),
@@ -153,12 +154,7 @@ const makeCompiler = async ({ production }) => {
       new webpack.optimize.CommonsChunkPlugin({
         name: 'commons',
         filename: 'commons.js',
-        // NOTE: In production, only extract dependencies that are in a quarter of the chunks
-        minChunks: (module, count) => (
-          production ?
-            (count >= slides.length / 4) :
-            (module.context && module.context.indexOf('node_modules') >= 0)
-        )
+        minChunks
       }),
 
       new webpack.optimize.CommonsChunkPlugin({
@@ -167,7 +163,6 @@ const makeCompiler = async ({ production }) => {
       }),
 
       new webpack.DefinePlugin({
-        '__SLIDES__': JSON.stringify(slides),
         '__SLIDES_FOLDER__': JSON.stringify(getSlidesFolder()),
         'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development')
       }),
@@ -180,7 +175,7 @@ const makeCompiler = async ({ production }) => {
       }),
 
       new CaseSensitivePathsPlugin(),
-      new SuppressEntryChunksPlugin(slideEntrypoints)
+      new SlidesPlugin()
     ].concat(production ? [
       new PrecacheWebpackPlugin({
         filename: 'sw.js',
@@ -198,7 +193,6 @@ const makeCompiler = async ({ production }) => {
         ]
       }),
 
-      new SaveSlidesMetaPlugin(slideEntrypoints),
       new CombineAssetsPlugin(['manifest.js', 'commons.js', 'main.js'], 'app.js'),
 
       new webpack.optimize.UglifyJsPlugin({
@@ -206,7 +200,7 @@ const makeCompiler = async ({ production }) => {
         sourceMap: false
       })
     ] : [
-      new WatchSlidePlugin(getSlidesFolder()),
+      new WatchSlidesPlugin(getSlidesFolder()),
       new webpack.NoEmitOnErrorsPlugin(),
       new webpack.HotModuleReplacementPlugin(),
       new FriendlyErrorsPlugin()

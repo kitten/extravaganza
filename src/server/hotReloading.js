@@ -15,7 +15,7 @@ const deleteCache = path => {
 class HotReloading {
   constructor() {
     this.success = false
-    this.prevChunks = []
+    this.slides = []
   }
 
   prepareMiddleware(app) {
@@ -44,15 +44,22 @@ class HotReloading {
 
       const { compilation: { chunks }} = stats
 
-      if (this.success) {
+      const slides = sort(
+        filterSlideChunks(chunks.map(x => x.name))
+      )
+
+      const slidesKey = slides.join()
+
+      if (this.success && slidesKey !== this.prevSlidesKey) {
         // Collect changes and send to client via hotMiddleware.publish
         this.hotMiddleware.publish({
-          chunks: filterSlideChunks(chunks.map(x => x.name)),
+          slides: slides.map(x => x.replace('slides/', '')),
           action: 'changed'
         })
       }
 
-      this.prevChunks = chunks
+      this.prevSlidesKey = slidesKey
+      this.slides = slides
       this.success = true
     })
 
@@ -83,30 +90,23 @@ class HotReloading {
     })
   }
 
-  getChunks() {
-    return this.stats.compilation.chunks
-  }
-
   getSlideNames() {
-    return sort(
-      filterSlideChunks(this.getChunks().map(({ name }) => name))
-    )
+    return this.slides.map(x => x.replace('slides/', ''))
   }
 
   getSlides() {
-    return this.getSlideNames()
-      .map(routeName => {
-        const requirePath = resolvePaths(getBuildFolder(false), `dist/${routeName}`)
-        const component = () => {
-          const WrappedComponent = require(requirePath).default
-          return createElement(WrappedComponent)
-        }
+    return this.slides.map(routeName => {
+      const requirePath = resolvePaths(getBuildFolder(false), `dist/${routeName}`)
+      const component = () => {
+        const WrappedComponent = require(requirePath).default
+        return createElement(WrappedComponent)
+      }
 
-        return {
-          component,
-          routeName
-        }
-      })
+      return {
+        component,
+        routeName
+      }
+    })
   }
 }
 

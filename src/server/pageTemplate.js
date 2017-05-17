@@ -10,7 +10,7 @@ const injectScripts = names => names.map(name => `
   <script type="text/javascript" src="/_extravaganza/${name}"></script>
 `).join('\n')
 
-const makePageTemplate = (html, css, scripts) => `
+const makePageTemplate = (html, css, scripts, slideNames) => `
   <html>
     <head>
       <meta httpequiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -24,6 +24,10 @@ const makePageTemplate = (html, css, scripts) => `
 
     <body>
       <div id="root">${html}</div>
+
+      <script type="text/javascript">
+        window.__SLIDES__ = ${JSON.stringify(slideNames)}
+      </script>
 
       ${injectScripts(scripts)}
     </body>

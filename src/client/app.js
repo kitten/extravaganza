@@ -41,6 +41,7 @@ class App extends Component {
 
   componentDidMount() {
     this.unsubscribe = this.props.slideManager.subscribe(slides => {
+      this.setState({ slides })
       this.forceUpdate()
     })
 

@@ -190,7 +190,8 @@ const makeCompiler = async ({ production }) => {
 
       new webpack.optimize.UglifyJsPlugin({
         compress: { warnings: false },
-        sourceMap: false
+        exclude: await findSlides(),
+        sourceMap: false,
       })
     ] : [
       new WatchSlidesPlugin(getSlidesFolder()),

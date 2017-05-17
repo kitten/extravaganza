@@ -17,7 +17,6 @@ const storeState = index => (
   }))
 )
 
-
 class SlideManager {
   constructor() {
     const slideNames = window.__SLIDES__ || []
@@ -76,8 +75,9 @@ class SlideManager {
   }
 
   preload(index) {
-    if (index >= 0 && index < this.slideLoaders.length) {
-      this.slideLoaders[index]()
+    const loadable = this.slides[index]
+    if (loadable !== undefined && typeof loadable.preload === 'function') {
+      loadable.preload()
     }
   }
 
@@ -134,16 +134,6 @@ if (window.__HOT_MIDDLEWARE__) {
     }
 
     slideManager.slideNames = slides
-
-    /*
-    const checkIdle = status => {
-      if (status === 'idle') {
-        module.hot.removeStatusHandler(checkIdle)
-      }
-    }
-
-    module.hot.status(checkIdle)
-    */
   })
 }
 

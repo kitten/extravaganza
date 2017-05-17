@@ -53,7 +53,7 @@ class HotReloading {
       if (this.success && slidesKey !== this.prevSlidesKey) {
         // Collect changes and send to client via hotMiddleware.publish
         this.hotMiddleware.publish({
-          slides,
+          slides: slides.map(x => x.replace('slides/', '')),
           action: 'changed'
         })
       }
@@ -91,7 +91,7 @@ class HotReloading {
   }
 
   getSlideNames() {
-    return this.slides.map(x => x.replace(/^slides\//, ''))
+    return this.slides.map(x => x.replace('slides/', ''))
   }
 
   getSlides() {

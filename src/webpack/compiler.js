@@ -183,7 +183,8 @@ const makeCompiler = async ({ production }) => {
         forceDelete: true,
         mergeStaticsConfig: true,
         staticFileGlobs: join(getContext(), 'static/**/*'),
-        staticFileGlobsIgnorePatterns: [/\.map$/]
+        staticFileGlobsIgnorePatterns: [/\.map$/],
+        logger: () => {}
       }),
 
       new CombineAssetsPlugin(['manifest.js', 'commons.js', 'main.js'], 'app.js'),
@@ -191,7 +192,7 @@ const makeCompiler = async ({ production }) => {
       new webpack.optimize.UglifyJsPlugin({
         compress: { warnings: false },
         exclude: await findSlides(),
-        sourceMap: false,
+        sourceMap: false
       })
     ] : [
       new WatchSlidesPlugin(getSlidesFolder()),

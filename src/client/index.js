@@ -10,10 +10,12 @@ import App from './app'
 import SlideManager from './slideManager'
 
 const node = document.getElementById('root')
-const slideManager = new SlideManager(slideLoaders, slideNames)
-
-render((
+const mount = slideManager => render((
   <BrowserRouter>
     <App slideManager={slideManager} />
   </BrowserRouter>
 ), node)
+
+SlideManager
+  .init(slideLoaders, slideNames)
+  .then(mount)

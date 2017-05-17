@@ -17,22 +17,35 @@ const storeState = index => (
 )
 
 class SlideManager {
-  constructor(slideLoaders = [], slideNames = []) {
-    const slides = slideLoaders
-      .map((loader, index) => {
+  constructor(slideLoaders = [], slides = []) {
+    this.slideLoaders = slideLoaders
+    this.slides = slides
+    this.emitter = mitt()
+  }
+
+  static async init(slideLoaders = [], slideNames = []) {
+    const slides = await Promise.all(
+      slideLoaders.map(async (loader, index) => {
         const routeName = slideNames[index]
-        const component = Loadable({
-          loader,
-          resolveModule: module => module.default,
-          LoadingComponent: Loading,
-          delay: 200
-        })
+        let component
+
+        if (routeMatchesIndex(index)) {
+          component = (await loader()).default
+        } else {
+          component = Loadable({
+            loader,
+            resolveModule: module => module.default,
+            LoadingComponent: Loading,
+            delay: 200
+          })
+        }
 
         return {
           component,
           routeName
         }
       })
+    )
 
     if (window.__HOT_MIDDLEWARE__) {
       window.__HOT_MIDDLEWARE__.subscribe(({ action }) => {
@@ -54,9 +67,8 @@ class SlideManager {
       })
     }
 
-    this.slideLoaders = slideLoaders
-    this.slides = slides
-    this.emitter = mitt()
+    const slideManager = new SlideManager(slideLoaders, slides)
+    return slideManager
   }
 
   getSlides() {
@@ -69,7 +81,9 @@ class SlideManager {
   }
 
   preload(index) {
-    this.slideLoaders[index]()
+    if (index >= 0 && index < this.slideLoaders.length) {
+      this.slideLoaders[index]()
+    }
   }
 
   getActiveSlide() {

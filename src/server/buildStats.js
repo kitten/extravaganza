@@ -10,7 +10,7 @@ class BuildStats {
   }
 
   getSlideNames() {
-    return this.slides.replace('slides/', '')
+    return this.slides.map(x => x.replace('slides/', ''))
   }
 
   getSlides() {

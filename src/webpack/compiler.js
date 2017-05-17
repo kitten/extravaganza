@@ -10,10 +10,9 @@ import rimraf from 'rimraf'
 import mkdirp from 'mkdirp-promise'
 
 import resolvePaths from '../utils/resolvePaths'
-import WatchSlidePlugin from './plugins/watchSlidePlugin'
+import SlidesPlugin from './plugins/slidesPlugin'
+import WatchSlidesPlugin from './plugins/watchSlidesPlugin'
 import CombineAssetsPlugin from './plugins/combineAssetsPlugin'
-import SaveSlidesMetaPlugin from './plugins/saveSlidesMetaPlugin'
-import SuppressEntryChunksPlugin from './plugins/suppressEntryChunksPlugin'
 import findBabelConfig from './babel/findConfig'
 import findSlides from './utils/findSlides'
 
@@ -52,6 +51,14 @@ const makeCompiler = async ({ production }) => {
     return entry
   }
 
+  let minChunks
+  if (production) {
+    const noSlides = (await findSlides()).length
+    minChunks = (_, count) => count >= noSlides / 4
+  } else {
+    minChunks = module => module.context && module.context.includes('node_modules')
+  }
+
   const babelOptions = {
     cacheDirectory: true,
     presets: []
@@ -85,18 +92,7 @@ const makeCompiler = async ({ production }) => {
 
     module: {
       rules: [
-        /*!production && {
-          test: /\.js$/,
-          include: [
-            getContext(),
-            getSlidesFolder()
-          ],
-          exclude: [
-            /node_modules/,
-            getTempFolder()
-          ],
-          loader: require.resolve('./loaders/hotAcceptLoader')
-        }, */{
+        {
           test: /\.json$/,
           exclude: [
             getTempFolder(),
@@ -158,12 +154,7 @@ const makeCompiler = async ({ production }) => {
       new webpack.optimize.CommonsChunkPlugin({
         name: 'commons',
         filename: 'commons.js',
-        // NOTE: In production, only extract dependencies that are in a quarter of the chunks
-        minChunks: (module, count) => (
-          production ?
-            (count >= slides.length / 4) :
-            (module.context && module.context.indexOf('node_modules') >= 0)
-        )
+        minChunks
       }),
 
       new webpack.optimize.CommonsChunkPlugin({
@@ -184,7 +175,7 @@ const makeCompiler = async ({ production }) => {
       }),
 
       new CaseSensitivePathsPlugin(),
-      new SuppressEntryChunksPlugin(/^slides\//)
+      new SlidesPlugin()
     ].concat(production ? [
       new PrecacheWebpackPlugin({
         filename: 'sw.js',
@@ -202,7 +193,6 @@ const makeCompiler = async ({ production }) => {
         ]
       }),
 
-      // new SaveSlidesMetaPlugin(slideEntrypoints),
       new CombineAssetsPlugin(['manifest.js', 'commons.js', 'main.js'], 'app.js'),
 
       new webpack.optimize.UglifyJsPlugin({
@@ -210,7 +200,7 @@ const makeCompiler = async ({ production }) => {
         sourceMap: false
       })
     ] : [
-      new WatchSlidePlugin(getSlidesFolder()),
+      new WatchSlidesPlugin(getSlidesFolder()),
       new webpack.NoEmitOnErrorsPlugin(),
       new webpack.HotModuleReplacementPlugin(),
       new FriendlyErrorsPlugin()

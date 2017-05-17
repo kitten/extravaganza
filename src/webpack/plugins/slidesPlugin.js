@@ -3,8 +3,8 @@ import sort from 'alphanum-sort'
 import findSlides from '../utils/findSlides'
 
 class SuppressEntryChunksPlugin {
-  constructor(regex) {
-    this.skip = regex
+  constructor() {
+    this.skip = /^slides\//
   }
 
   apply (compiler) {

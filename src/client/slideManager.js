@@ -2,6 +2,7 @@ import mitt from 'mitt'
 import { matchPath, history } from 'react-router-dom'
 import Loadable from 'react-loadable'
 
+import { loadSlide } from './utils/slideLoaders'
 import Loading from './components/loading'
 
 const routeMatchesIndex = index => matchPath(
@@ -16,59 +17,53 @@ const storeState = index => (
   }))
 )
 
+
 class SlideManager {
-  constructor(slideLoaders = [], slides = []) {
-    this.slideLoaders = slideLoaders
-    this.slides = slides
+  constructor() {
+    const slideNames = window.__SLIDES__ || []
+
+    this.slideNames = slideNames
+    this.slides = []
     this.emitter = mitt()
+    this.loadSlide = loadSlide
+    this.ready$ = this.prepareSlides(slideNames, true)
   }
 
-  static async init(slideLoaders = [], slideNames = []) {
-    const slides = await Promise.all(
-      slideLoaders.map(async (loader, index) => {
-        const routeName = slideNames[index]
-        let component
+  waitUntilReady() {
+    return this.ready$
+  }
 
-        if (routeMatchesIndex(index)) {
-          component = (await loader()).default
-        } else {
-          component = Loadable({
+  prepareSlides(slideNames, preloadFirst = false) {
+    this.isReady = false
+
+    return Promise.all(
+      slideNames.map(async (routeName, index) => {
+        const loader = () => this.loadSlide(routeName)
+
+        const component = (preloadFirst && routeMatchesIndex(index)) ?
+          (await loader()).default :
+          Loadable({
             loader,
             resolveModule: module => module.default,
             LoadingComponent: Loading,
             delay: 200
           })
-        }
 
         return {
           component,
           routeName
         }
       })
-    )
+    ).then(slides => {
+      this.slides = slides
+      return this
+    })
+  }
 
-    if (window.__HOT_MIDDLEWARE__) {
-      window.__HOT_MIDDLEWARE__.subscribe(({ action }) => {
-        if (action !== 'changed') {
-          return
-        }
-
-        const checkIdle = status => {
-          if (status === 'idle') {
-            module.hot.removeStatusHandler(checkIdle)
-
-            // Notify app of changes
-            console.log('[Extravaganza] Hot reloading slides')
-            this.emitter.emit('hotReload')
-          }
-        }
-
-        module.hot.status(checkIdle)
-      })
-    }
-
-    const slideManager = new SlideManager(slideLoaders, slides)
-    return slideManager
+  updateSlides() {
+    return this.prepareSlides(this.slideNames).then(() => {
+      this.emitter.emit('hotReload', this.slides)
+    })
   }
 
   getSlides() {
@@ -130,4 +125,33 @@ class SlideManager {
   }
 }
 
-export default SlideManager
+const slideManager = new SlideManager()
+
+if (window.__HOT_MIDDLEWARE__) {
+  window.__HOT_MIDDLEWARE__.subscribe(({ action, slides }) => {
+    if (action !== 'changed') {
+      return
+    }
+
+    slideManager.slideNames = slides
+
+    /*
+    const checkIdle = status => {
+      if (status === 'idle') {
+        module.hot.removeStatusHandler(checkIdle)
+      }
+    }
+
+    module.hot.status(checkIdle)
+    */
+  })
+}
+
+if (module.hot) {
+  module.hot.accept('./utils/slideLoaders', () => {
+    slideManager.loadSlide = require('./utils/slideLoaders').loadSlide
+    slideManager.updateSlides()
+  })
+}
+
+export default slideManager

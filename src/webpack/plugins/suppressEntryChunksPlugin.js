@@ -1,19 +1,33 @@
+import sort from 'alphanum-sort'
+
+import findSlides from '../utils/findSlides'
+
 class SuppressEntryChunksPlugin {
-  constructor(entryChunks = []) {
-    this.skip = entryChunks
+  constructor(regex) {
+    this.skip = regex
   }
 
   apply (compiler) {
-    compiler.plugin('emit', (compilation, callback) => {
+    compiler.plugin('after-compile', (compilation, callback) => {
       compilation.chunks.forEach(chunk => {
-        if (this.skip.includes(chunk.name)) {
+        if (chunk.name && this.skip.test(chunk.name)) {
+          // Remove all suppressed slide entrypoints from result
           chunk.files.forEach(file => {
             delete compilation.assets[file]
           })
         }
       })
 
-      callback()
+      findSlides().then(slides => {
+        const slidesJSON = JSON.stringify(sort(slides))
+
+        compilation.assets['assets.json'] = {
+          source: () => slidesJSON,
+          size: () => slidesJSON.length
+        }
+
+        callback()
+      })
     })
   }
 }

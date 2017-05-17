@@ -27,6 +27,11 @@ export const getTempFolder = () => resolvePaths(
   '.extravaganza/'
 )
 
+export const getHappyPackCache = () => resolvePaths(
+  getContext(),
+  '.extravaganza/happypack/'
+)
+
 export const getBuildFolder = production => !production ?
   getTempFolder() :
   resolvePaths(

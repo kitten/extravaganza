@@ -6,13 +6,14 @@ import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin'
 import WriteFilePlugin from 'write-file-webpack-plugin'
 import PrecacheWebpackPlugin from 'sw-precache-webpack-plugin'
-import sort from 'alphanum-sort'
 import rimraf from 'rimraf'
+import mkdirp from 'mkdirp-promise'
 
 import resolvePaths from '../utils/resolvePaths'
-import SlidePlugin from './plugins/slidePlugin'
 import WatchSlidePlugin from './plugins/watchSlidePlugin'
 import CombineAssetsPlugin from './plugins/combineAssetsPlugin'
+import SaveSlidesMetaPlugin from './plugins/saveSlidesMetaPlugin'
+import SuppressEntryChunksPlugin from './plugins/suppressEntryChunksPlugin'
 import findBabelConfig from './babel/findConfig'
 
 import {
@@ -20,7 +21,8 @@ import {
   getBuildFolder,
   getTempFolder,
   getSlidesFolder,
-  getThemePath
+  getThemePath,
+  getHappyPackCache
 } from '../user/config'
 
 const nodePathList = (process.env.NODE_PATH || '')
@@ -30,31 +32,20 @@ const nodePathList = (process.env.NODE_PATH || '')
 const rm = dir => new Promise(resolve => rimraf(dir, resolve))
 
 const makeCompiler = async ({ production }) => {
-  const makeEntry = async () => {
-    const entry = {
-      'main.js': [
-        !production && require.resolve('../client/hotMiddlewareClient'),
-        !production && require.resolve('react-hot-loader/patch'),
-        require.resolve('../client/index')
-      ].filter(Boolean)
-    }
-
-    const slides = await glob('slides/**/*.js', { cwd: getContext() })
-
-    for (const slide of sort(slides)) {
-      if (entry[slide] === undefined) {
-        entry[slide] = [ resolvePaths(getContext(), `./${slide}`) ]
-      }
-    }
-
-    return entry
+  const entry = {
+    'main.js': [
+      !production && require.resolve('../client/hotMiddlewareClient'),
+      !production && require.resolve('react-hot-loader/patch'),
+      require.resolve('../client/index')
+    ].filter(Boolean)
   }
 
-  let totalSlides
-  if (production) {
-    const _slides = await glob('slides/**/*.js', { cwd: getContext() })
-    totalSlides = _slides.length
-  }
+  const slides = await glob('**/*.js', { cwd: getSlidesFolder() })
+  const slideEntrypoints = slides.map(x => `slides/${x}`)
+
+  slideEntrypoints.forEach(slide => {
+    entry[slide] = [ resolvePaths(getContext(), `./${slide}`) ]
+  })
 
   const babelOptions = {
     cacheDirectory: true,
@@ -77,7 +68,7 @@ const makeCompiler = async ({ production }) => {
   const config = {
     context: getContext(),
     devtool: production ? false : 'cheap-module-inline-source-map',
-    entry: production ? await makeEntry() : makeEntry,
+    entry,
 
     output: {
       path: getBuildFolder(production),
@@ -89,19 +80,7 @@ const makeCompiler = async ({ production }) => {
 
     module: {
       rules: [
-        {
-          test: /\.js$/,
-          include: [
-            getSlidesFolder()
-          ],
-          use: [{
-            loader: require.resolve('bundle-loader'),
-            options: {
-              lazy: true,
-              name: '[name]'
-            }
-          }]
-        }, !production && {
+        !production && {
           test: /\.js$/,
           include: [
             getContext(),
@@ -161,7 +140,7 @@ const makeCompiler = async ({ production }) => {
     plugins: [
       new HappyPack({
         id: 'babel',
-        tempDir: join(getTempFolder(), '.happypack/'),
+        tempDir: getHappyPackCache(),
         loaders: [
           {
             path: require.resolve('babel-loader'),
@@ -174,9 +153,10 @@ const makeCompiler = async ({ production }) => {
       new webpack.optimize.CommonsChunkPlugin({
         name: 'commons',
         filename: 'commons.js',
+        // NOTE: In production, only extract dependencies that are in a quarter of the chunks
         minChunks: (module, count) => (
           production ?
-            (count >= totalSlides * 0.5) :
+            (count >= slides.length / 4) :
             (module.context && module.context.indexOf('node_modules') >= 0)
         )
       }),
@@ -187,12 +167,8 @@ const makeCompiler = async ({ production }) => {
       }),
 
       new webpack.DefinePlugin({
-        '__CONTEXT__': JSON.stringify(
-          relative(
-            require.resolve('../client/index'),
-            getSlidesFolder()
-          )
-        ),
+        '__SLIDES__': JSON.stringify(slides),
+        '__SLIDES_FOLDER__': JSON.stringify(getSlidesFolder()),
         'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development')
       }),
 
@@ -203,8 +179,8 @@ const makeCompiler = async ({ production }) => {
         useHashIndex: false
       }),
 
-      new SlidePlugin(production),
-      new CaseSensitivePathsPlugin()
+      new CaseSensitivePathsPlugin(),
+      new SuppressEntryChunksPlugin(slideEntrypoints)
     ].concat(production ? [
       new PrecacheWebpackPlugin({
         filename: 'sw.js',
@@ -221,9 +197,13 @@ const makeCompiler = async ({ production }) => {
           }
         ]
       }),
-      new CombineAssetsPlugin({
-        outputFile: 'app.js',
-        statsFile: join(getBuildFolder(true), 'stats.json')
+
+      new SaveSlidesMetaPlugin(slideEntrypoints),
+      new CombineAssetsPlugin(['manifest.js', 'commons.js', 'main.js'], 'app.js'),
+
+      new webpack.optimize.UglifyJsPlugin({
+        compress: { warnings: false },
+        sourceMap: false
       })
     ] : [
       new WatchSlidePlugin(getSlidesFolder()),
@@ -241,6 +221,7 @@ const makeCompiler = async ({ production }) => {
   }
 
   await rm(getBuildFolder(production))
+  await mkdirp(getHappyPackCache())
 
   return webpack(config)
 }

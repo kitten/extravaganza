@@ -6,15 +6,11 @@ const sanitizeCSS = readFileSync(
   { encoding: 'utf8' }
 )
 
-const pageBucketScript = `window.__SLIDE_LOADERS__ = {};window.__REGISTER_SLIDE__ = function (routeName, loader) {window.__SLIDE_LOADERS__[routeName] = loader}`
+const injectScripts = names => names.map(name => `
+  <script type="text/javascript" src="/_extravaganza/${name}"></script>
+`).join('\n')
 
-const pageSlideScripts = slides => slides
-  .map(slideRoute => `
-    <script type="text/javascript" src="/_extravaganza/${slideRoute}"></script>
-  `)
-  .join('')
-
-const makePageTemplate = (html, css, slides) => `
+const makePageTemplate = (html, css, scripts) => `
   <html>
     <head>
       <meta httpequiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -29,8 +25,7 @@ const makePageTemplate = (html, css, slides) => `
     <body>
       <div id="root">${html}</div>
 
-      <script>${pageBucketScript}</script>
-      ${pageSlideScripts(slides)}
+      ${injectScripts(scripts)}
     </body>
   </html>
 `

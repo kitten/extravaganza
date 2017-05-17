@@ -2,26 +2,11 @@ import mitt from 'mitt'
 import { matchPath, history } from 'react-router-dom'
 import Loadable from 'react-loadable'
 
-import Loading from './loading'
-
-const ensure = slideLoader => () => (
-  new Promise(resolve => slideLoader(resolve))
-)
+import Loading from './components/loading'
 
 const routeMatchesIndex = index => matchPath(
   window.location.pathname, { path: `/${index}` }
 ) !== null
-
-const preload = (slideLoaders, index) => {
-  if (index >= slideLoaders.length || index < 0) {
-    return
-  }
-
-  const { isLoaded, loader } = slideLoaders[index]
-  if (!isLoaded) {
-    loader()
-  }
-}
 
 const LOCALSTORAGE_KEY = 'extravaganza-state'
 
@@ -32,58 +17,22 @@ const storeState = index => (
 )
 
 class SlideManager {
-  constructor(slideLoaders = [], slides = []) {
-    this.slideLoaders = slideLoaders
-    this.slides = slides
-    this.emitter = mitt()
-  }
-
-  static async init(_slideLoaders) {
-    const slideLoaders = Object
-      .keys(_slideLoaders)
-      .map((routeName, index) => {
-        const { slideLoader } = _slideLoaders[routeName]()
-
-        const entry = { routeName, isLoaded: false }
-        entry.loader = () => new Promise(resolve => {
-          slideLoader(component => {
-            entry.isLoaded = true
-            resolve(component)
-          })
+  constructor(slideLoaders = [], slideNames = []) {
+    const slides = slideLoaders
+      .map((loader, index) => {
+        const routeName = slideNames[index]
+        const component = Loadable({
+          loader,
+          resolveModule: module => module.default,
+          LoadingComponent: Loading,
+          delay: 200
         })
-
-        return entry
-      })
-
-    const slides = await Promise.all(
-      slideLoaders.map(async ({ routeName, loader }, index) => {
-        let component
-        if (routeMatchesIndex(index)) {
-          // Preload slide if it's active
-          component = (await loader()).default
-
-          setTimeout(() => {
-            storeState(index)
-            preload(slideLoaders, index - 1)
-            preload(slideLoaders, index + 1)
-          })
-        } else {
-          component = Loadable({
-            loader,
-            resolveModule: module => module.default,
-            LoadingComponent: Loading,
-            delay: 200
-          })
-        }
 
         return {
           component,
           routeName
         }
       })
-    )
-
-    const slideManager = new SlideManager(slideLoaders, slides)
 
     if (window.__HOT_MIDDLEWARE__) {
       window.__HOT_MIDDLEWARE__.subscribe(({ action }) => {
@@ -94,7 +43,10 @@ class SlideManager {
         const checkIdle = status => {
           if (status === 'idle') {
             module.hot.removeStatusHandler(checkIdle)
-            slideManager.notifyChanged()
+
+            // Notify app of changes
+            console.log('[Extravaganza] Hot reloading slides')
+            this.emitter.emit('hotReload')
           }
         }
 
@@ -102,12 +54,9 @@ class SlideManager {
       })
     }
 
-    return slideManager
-  }
-
-  notifyChanged(routeNames = []) {
-    console.log('[Extravaganza] Hot reloading slides')
-    this.emitter.emit('hotReload')
+    this.slideLoaders = slideLoaders
+    this.slides = slides
+    this.emitter = mitt()
   }
 
   getSlides() {
@@ -120,7 +69,7 @@ class SlideManager {
   }
 
   preload(index) {
-    preload(this.slideLoaders, index)
+    this.slideLoaders[index]()
   }
 
   getActiveSlide() {

@@ -7,12 +7,12 @@ import RedBox from 'redbox-react'
 import InnerApp from '../client/innerApp'
 import makePageTemplate, { makeErrorTemplate } from './pageTemplate'
 
+const prodAssets= ['app.js']
+const devAssets = ['manifest.js', 'commons.js', 'main.js']
+
 const requestHandler = (req, res, { build, production }) => {
   try {
     const slides = build.getSlides()
-    const assetNames = ['manifest.js', 'commons.js']
-      .concat(build.getSlideNames(), ['main.js'])
-
     const sheet = new ServerStyleSheet()
     const app = renderToString(
       sheet.collectStyles(
@@ -23,7 +23,7 @@ const requestHandler = (req, res, { build, production }) => {
     )
 
     const css = sheet.getStyleTags()
-    const html = makePageTemplate(app, css, production ? ['app.js'] : assetNames)
+    const html = makePageTemplate(app, css, production ? prodAssets : devAssets)
 
     res.status(200).send(html)
   } catch (err) {

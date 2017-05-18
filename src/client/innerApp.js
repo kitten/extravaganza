@@ -32,9 +32,10 @@ export const InnerApp = ({ slides }) => (
         exact
         path="/:id"
         render={({ match }) => (
-          <SlideTransition id={match.params.id}>
-            {findSlide(slides, match.params.id)}
-          </SlideTransition>
+          <SlideTransition
+            id={match.params.id}
+            element={findSlide(slides, match.params.id)}
+          />
         )}
       />
 

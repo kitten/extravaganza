@@ -1,12 +1,17 @@
 import mitt from 'mitt'
-import { matchPath, history } from 'react-router-dom'
+import { matchPath } from 'react-router-dom'
 import Loadable from 'react-loadable'
 
+import history from './history'
 import { loadSlide } from './utils/slideLoaders'
 import Loading from './components/loading'
 
 const routeMatchesIndex = index =>
-  matchPath(window.location.pathname, { path: `/${index}` }) !== null
+  matchPath(window.location.pathname, {
+    path: `/${index}`,
+    exact: true,
+    strict: true
+  }) !== null
 
 const LOCALSTORAGE_KEY = 'extravaganza-state'
 
@@ -87,29 +92,29 @@ class SlideManager {
     return index
   }
 
-  gotoNext(push) {
+  gotoNext() {
     const index = this.getActiveSlide()
     const nextIndex = index + 1
 
     if (nextIndex < this.slides.length) {
-      push(`/${nextIndex}`)
+      history.push(`/${nextIndex}`)
       this.preload(nextIndex + 1)
       storeState(nextIndex)
     }
   }
 
-  gotoPrev(push) {
+  gotoPrev() {
     const index = this.getActiveSlide()
     const nextIndex = index - 1
 
     if (nextIndex >= 0) {
-      push(`/${nextIndex}`)
+      history.push(`/${nextIndex}`)
       this.preload(nextIndex - 1)
       storeState(nextIndex)
     }
   }
 
-  updateState({ key, newValue }, push) {
+  updateState({ key, newValue }) {
     if (key === LOCALSTORAGE_KEY) {
       const { slide } = JSON.parse(newValue)
       const index = this.getActiveSlide()
@@ -120,7 +125,7 @@ class SlideManager {
         slide < this.slides.length &&
         slide !== index
       ) {
-        push(`/${slide}`)
+        history.push(`/${slide}`)
       }
     }
   }

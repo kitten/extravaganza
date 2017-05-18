@@ -1,6 +1,4 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
-
 import InnerApp from './innerApp'
 
 const prevSlideKeys = [37, 33]
@@ -12,31 +10,26 @@ class App extends Component {
   }
 
   handleKey = ({ keyCode }) => {
-    const { push } = this.props.history
-
     if (nextSlideKeys.includes(keyCode)) {
-      this.props.slideManager.gotoNext(push)
+      this.props.slideManager.gotoNext()
     } else if (prevSlideKeys.includes(keyCode)) {
-      this.props.slideManager.gotoPrev(push)
+      this.props.slideManager.gotoPrev()
     }
   }
 
   handleTouch = ({ touches }) => {
-    const { push } = this.props.history
-
     if (touches.length === 1) {
       const { clientX } = touches[0]
       if (clientX >= window.innerWidth / 2) {
-        this.props.slideManager.gotoNext(push)
+        this.props.slideManager.gotoNext()
       } else {
-        this.props.slideManager.gotoPrev(push)
+        this.props.slideManager.gotoPrev()
       }
     }
   }
 
   updateSlide = evt => {
-    const push = this.props.history.push
-    this.props.slideManager.updateState(evt, push)
+    this.props.slideManager.updateState(evt)
   }
 
   componentDidMount() {
@@ -63,4 +56,4 @@ class App extends Component {
   }
 }
 
-export default withRouter(App)
+export default App

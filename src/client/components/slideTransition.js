@@ -1,49 +1,91 @@
-import React, { cloneElement } from 'react'
-import TransitionMotion from 'react-motion/lib/TransitionMotion'
-import { Route } from 'react-router-dom'
-import spring from 'react-motion/lib/spring'
+import React, { Component } from 'react'
+import Animated from 'animated/lib/targets/react-dom'
 
-const gentle = { stiffness: 90, damping: 20 }
-const ensureSpring = styles => Object
-  .keys(styles)
-  .reduce((acc, key) => {
-    const value = styles[key]
-    acc[key] = typeof value === 'number' ? spring(value, gentle) : value
-    return acc
-  }, {})
+import Container from './container'
+import SlideContainer from './slideContainer'
 
-const SlideTransition = ({
-  pathname,
-  Parent,
-  Child,
-  children,
-  atEnter,
-  atActive,
-  atLeave
-}) => (
-  <TransitionMotion
-    styles={children ? [{
-      key: pathname,
-      data: children,
-      style: ensureSpring(atActive)
-    }] : []}
-    willEnter={() => atEnter}
-    willLeave={() => ensureSpring(atLeave)}
-  >
-    {
-      styles => (
-        <Parent>
-          {
-            styles.map(({ key, data, style }) => (
-              <Child key={key} style={style}>
-                {data}
-              </Child>
-            ))
-          }
-        </Parent>
-      )
+const makeStyle = (element, value) => ({ element, value })
+const findStyle = (styles, id) => styles.find(x => x.id === id)
+const springConfig = { friction: 10, tension: 35 }
+
+class SlideTransition extends Component {
+  state = {
+    // Initial state should not animate
+    styles: {
+      [this.props.id]: makeStyle(this.props.element, new Animated.Value(0))
     }
-  </TransitionMotion>
-)
+  }
+
+  transitionIn = (lastId, { id, element }) => {
+    const { styles } = this.state
+
+    const origin = id > lastId ? 1 : -1
+    const value = styles[id] === undefined
+      ? new Animated.Value(origin)
+      : styles[id].value
+
+    const style = makeStyle(element, value)
+
+    setTimeout(() => {
+      Animated.spring(value, { ...springConfig, toValue: 0 }).start()
+    })
+
+    this.setState(({ styles }) => ({
+      styles: { ...styles, [id]: style }
+    }))
+  }
+
+  transitionOut = (id, nextId) => {
+    const { styles } = this.state
+    const style = styles[id]
+
+    if (style === undefined) {
+      return
+    }
+
+    const toValue = id < nextId ? -1 : 1
+
+    Animated.spring(style.value, {
+      ...springConfig,
+      toValue
+    }).start(({ finished }) => {
+      if (!finished) {
+        return
+      }
+
+      this.setState(({ styles }) => ({
+        styles: { ...styles, [id]: undefined }
+      }))
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.id === this.props.id) {
+      return
+    }
+
+    this.transitionIn(this.props.id, nextProps)
+    this.transitionOut(this.props.id, nextProps.id)
+  }
+
+  render() {
+    const { styles } = this.state
+
+    return (
+      <Container>
+        {Object.keys(styles)
+          .map(id => {
+            if (styles[id] === undefined) {
+              return undefined
+            }
+
+            const { element, value } = styles[id]
+            return <SlideContainer key={id} value={value} element={element} />
+          })
+          .filter(x => x !== undefined)}
+      </Container>
+    )
+  }
+}
 
 export default SlideTransition

@@ -38,6 +38,7 @@
   "license": "MIT",
   "dependencies": {
     "alphanum-sort": "^1.0.2",
+    "animated": "^0.2.0",
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
     "babel-plugin-polished": "^1.0.3",
@@ -72,7 +73,6 @@
     "react-hot-loader": "^3.0.0-beta.7",
     "react-live": "^1.4.8",
     "react-loadable": "^3.3.1",
-    "react-motion": "^0.5.0",
     "react-router-dom": "^4.1.1",
     "redbox-react": "^1.3.6",
     "rimraf": "^2.6.1",

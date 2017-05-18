@@ -1,4 +1,4 @@
-import React, { Component, createElement } from 'react'
+import React, { Component } from 'react'
 import Animated from 'animated/lib/targets/react-dom'
 
 import Container from './container'
@@ -80,12 +80,7 @@ class SlideTransition extends Component {
             }
 
             const { element, value } = styles[id]
-
-            return (
-              <SlideContainer key={id} value={value}>
-                {createElement(element, { value })}
-              </SlideContainer>
-            )
+            return <SlideContainer key={id} value={value} element={element} />
           })
           .filter(x => x !== undefined)}
       </Container>

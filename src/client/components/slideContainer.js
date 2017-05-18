@@ -1,21 +1,32 @@
-import React, { Component } from 'react'
+import React, { Component, createElement } from 'react'
 import styled from 'styled-components'
 import Animated from 'animated/lib/targets/react-dom'
 
 class SlideContainer extends Component {
+  opacity = Animated.add(
+    Animated.multiply(
+      Animated.multiply(this.props.value, this.props.value),
+      new Animated.Value(-1)
+    ),
+    new Animated.Value(1)
+  )
+
   translateX = this.props.value.interpolate({
     inputRange: [-1, 1],
     outputRange: ['-100%', '100%']
   })
 
   render() {
-    const { translateX } = this
-    const { className, children } = this.props
-    const style = { transform: [{ translateX }] }
+    const { translateX, opacity } = this
+    const { element, className, children } = this.props
+    const style = {
+      transform: [{ translateX }],
+      opacity
+    }
 
     return (
       <Animated.div className={className} style={style}>
-        {children}
+        {createElement(element, { transition: opacity })}
       </Animated.div>
     )
   }

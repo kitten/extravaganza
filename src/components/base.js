@@ -4,16 +4,16 @@ import ensureUnit from './utils/ensureUnit'
 import ensureColour from './utils/ensureColour'
 
 const base = css`
-  font-style: ${p => p.italic ? 'italic' : 'inherit'};
-  font-weight: ${p => p.bold ? 'bold' : 'inherit'};
-  text-transform: ${p => p.caps ? 'uppercase': 'none'};
-  color: ${p => p.textColor ? ensureColour(p.textColor) : 'inherit'};
-  font-size: ${p => p.textSize ? ensureUnit(p.textSize) : 'inherit'};
+  font-style: ${p => (p.italic ? 'italic' : 'inherit')};
+  font-weight: ${p => (p.bold ? 'bold' : 'inherit')};
+  text-transform: ${p => (p.caps ? 'uppercase' : 'none')};
+  color: ${p => (p.textColor ? ensureColour(p.textColor) : 'inherit')};
+  font-size: ${p => (p.textSize ? ensureUnit(p.textSize) : 'inherit')};
   border: ${p => p.border || 'none'};
 
-  margin: ${p => p.margin ? ensureUnit(p.margin) : 0};
-  padding: ${p => p.padding ? ensureUnit(p.padding) : 0};
-  background: ${p => p.background ? ensureColour(p.background) : 'none'};
+  margin: ${p => (p.margin ? ensureUnit(p.margin) : 0)};
+  padding: ${p => (p.padding ? ensureUnit(p.padding) : 0)};
+  background: ${p => (p.background ? ensureColour(p.background) : 'none')};
 
   ${p => p.width && css`
     max-width: ${ensureUnit(p.width)};

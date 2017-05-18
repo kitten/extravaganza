@@ -45,7 +45,7 @@ const makeCompiler = async ({ production }) => {
     const slides = await findSlides()
 
     slides.forEach(slide => {
-      entry[slide] = [ resolvePaths(getContext(), slide) ]
+      entry[slide] = [resolvePaths(getContext(), slide)]
     })
 
     return entry
@@ -56,7 +56,8 @@ const makeCompiler = async ({ production }) => {
     const noSlides = (await findSlides()).length
     minChunks = (_, count) => count >= noSlides / 4
   } else {
-    minChunks = module => module.context && module.context.includes('node_modules')
+    minChunks = module =>
+      module.context && module.context.includes('node_modules')
   }
 
   const babelOptions = {
@@ -67,7 +68,7 @@ const makeCompiler = async ({ production }) => {
   const externalBabelConfig = findBabelConfig(getContext())
   if (externalBabelConfig) {
     console.log(`> Found external babel configuration`)
-    const { options: { babelrc }} = externalBabelConfig
+    const { options: { babelrc } } = externalBabelConfig
     babelOptions.babelrc = babelrc !== false
   } else {
     babelOptions.babelrc = false
@@ -94,34 +95,27 @@ const makeCompiler = async ({ production }) => {
       rules: [
         {
           test: /\.json$/,
-          exclude: [
-            getTempFolder(),
-            /node_modules/
-          ],
+          exclude: [getTempFolder(), /node_modules/],
           loader: require.resolve('json-loader')
-        }, {
+        },
+        {
           test: /\.(js|json)$/,
-          include: [
-            getContext(),
-            getSlidesFolder()
-          ],
-          exclude: [
-            /node_modules/,
-            getTempFolder()
-          ],
+          include: [getContext(), getSlidesFolder()],
+          exclude: [/node_modules/, getTempFolder()],
           loader: require.resolve('./loaders/emitFileLoader')
-        }, {
+        },
+        {
           test: /\.js$/,
-          exclude: [
-            getTempFolder(),
-            /node_modules/
-          ],
-          use: [!production && {
-            loader: require.resolve('react-hot-loader/webpack')
-          }, {
-            loader: require.resolve('happypack/loader'),
-            query: { id: 'babel' }
-          }].filter(Boolean)
+          exclude: [getTempFolder(), /node_modules/],
+          use: [
+            !production && {
+              loader: require.resolve('react-hot-loader/webpack')
+            },
+            {
+              loader: require.resolve('happypack/loader'),
+              query: { id: 'babel' }
+            }
+          ].filter(Boolean)
         }
       ].filter(Boolean)
     },
@@ -163,8 +157,10 @@ const makeCompiler = async ({ production }) => {
       }),
 
       new webpack.DefinePlugin({
-        '__SLIDES_FOLDER__': JSON.stringify(getSlidesFolder()),
-        'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development')
+        __SLIDES_FOLDER__: JSON.stringify(getSlidesFolder()),
+        'process.env.NODE_ENV': JSON.stringify(
+          production ? 'production' : 'development'
+        )
       }),
 
       new WriteFilePlugin({
@@ -176,43 +172,54 @@ const makeCompiler = async ({ production }) => {
 
       new CaseSensitivePathsPlugin(),
       new SlidesPlugin()
-    ].concat(production ? [
-      new PrecacheWebpackPlugin({
-        filename: 'sw.js',
-        minify: true,
-        runtimeCaching: [
-          {
-            handler: 'fastest',
-            urlPattern: /[.](png|jpg|gif|css|woff|woff2|ttf|otf)/
-          },
-          {
-            handler: 'networkFirst',
-            urlPattern: /^http.*/
-          }
-        ],
-        logger: () => {}
-      }),
+    ].concat(
+      production
+        ? [
+            new PrecacheWebpackPlugin({
+              filename: 'sw.js',
+              minify: true,
+              runtimeCaching: [
+                {
+                  handler: 'fastest',
+                  urlPattern: /[.](png|jpg|gif|css|woff|woff2|ttf|otf)/
+                },
+                {
+                  handler: 'networkFirst',
+                  urlPattern: /^http.*/
+                }
+              ],
+              logger: () => {}
+            }),
 
-      new CombineAssetsPlugin(['manifest.js', 'commons.js', 'main.js'], 'app.js'),
+            new CombineAssetsPlugin(
+              ['manifest.js', 'commons.js', 'main.js'],
+              'app.js'
+            ),
 
-      new webpack.optimize.UglifyJsPlugin({
-        compress: { warnings: false },
-        exclude: await findSlides(),
-        sourceMap: false
-      })
-    ] : [
-      new WatchSlidesPlugin(getSlidesFolder()),
-      new webpack.NoEmitOnErrorsPlugin(),
-      new webpack.HotModuleReplacementPlugin(),
-      new FriendlyErrorsPlugin()
-    ]),
+            new webpack.optimize.UglifyJsPlugin({
+              compress: { warnings: false },
+              exclude: await findSlides(),
+              sourceMap: false
+            })
+          ]
+        : [
+            new WatchSlidesPlugin(getSlidesFolder()),
+            new webpack.NoEmitOnErrorsPlugin(),
+            new webpack.HotModuleReplacementPlugin(),
+            new FriendlyErrorsPlugin()
+          ]
+    ),
 
     stats: true
   }
 
   if (production) {
-    config.resolve.alias.react = require.resolve('preact-compat/dist/preact-compat')
-    config.resolve.alias['react-dom'] = require.resolve('preact-compat/dist/preact-compat')
+    config.resolve.alias.react = require.resolve(
+      'preact-compat/dist/preact-compat'
+    )
+    config.resolve.alias['react-dom'] = require.resolve(
+      'preact-compat/dist/preact-compat'
+    )
   }
 
   await rm(getBuildFolder(production))

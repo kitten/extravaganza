@@ -42,11 +42,9 @@ class HotReloading {
     this.compiler.plugin('done', stats => {
       this.stats = stats // Update internal stats
 
-      const { compilation: { chunks }} = stats
+      const { compilation: { chunks } } = stats
 
-      const slides = sort(
-        filterSlideChunks(chunks.map(x => x.name))
-      )
+      const slides = sort(filterSlideChunks(chunks.map(x => x.name)))
 
       const slidesKey = slides.join()
 
@@ -96,7 +94,10 @@ class HotReloading {
 
   getSlides() {
     return this.slides.map(routeName => {
-      const requirePath = resolvePaths(getBuildFolder(false), `dist/${routeName}`)
+      const requirePath = resolvePaths(
+        getBuildFolder(false),
+        `dist/${routeName}`
+      )
       const component = () => {
         const WrappedComponent = require(requirePath).default
         return createElement(WrappedComponent)

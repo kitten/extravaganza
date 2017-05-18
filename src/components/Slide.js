@@ -15,9 +15,7 @@ const Outer = styled.div`
 
   ${base}
 
-  background: ${(
-    p => p.background || p.theme.colors.background
-  )};
+  background: ${p => p.background || p.theme.colors.background};
 `
 
 const Inner = styled.div`
@@ -25,25 +23,17 @@ const Inner = styled.div`
   position: relative;
   flex: 1;
 
-  align-items: ${(
-    p => p.align ?
-      p.align.split(' ')[1] :
-      'center'
-  )};
+  align-items: ${p => (p.align ? p.align.split(' ')[1] : 'center')};
 
-  justify-content: ${(
-    p => p.align ?
-      p.align.split(' ')[0] :
-      'center'
-  )};
+  justify-content: ${p => (p.align ? p.align.split(' ')[0] : 'center')};
 `
 
 const Content = styled.div`
   flex: 1;
-  max-height: ${p => p.maxHeight ? ensureUnit(p.maxHeight) : '700px'};
-  max-width: ${p => p.maxWidth ? ensureUnit(p.maxWidth) : '1000px'};
+  max-height: ${p => (p.maxHeight ? ensureUnit(p.maxHeight) : '700px')};
+  max-width: ${p => (p.maxWidth ? ensureUnit(p.maxWidth) : '1000px')};
   transform: scale(${p => p.scale});
-  padding: ${p => ensureUnit(p.zoom > 0.6 ? (p.margin || 40) : 10)};
+  padding: ${p => ensureUnit(p.zoom > 0.6 ? p.margin || 40 : 10)};
   text-align: center;
 `
 
@@ -54,7 +44,7 @@ class Slide extends Component {
   }
 
   zoom = () => {
-    const mobile = window.matchMedia("(max-width: 628px)").matches
+    const mobile = window.matchMedia('(max-width: 628px)').matches
     const content = this.contentRef
 
     if (content) {
@@ -63,7 +53,7 @@ class Slide extends Component {
       const contentScaleY = content.parentNode.offsetHeight / 700
       const contentScaleX = content.parentNode.offsetWidth / 700
       const minScale = Math.min(contentScaleY, contentScaleX)
-      const scale = mobile ? 1 : (minScale < 1 ? minScale : 1)
+      const scale = mobile ? 1 : minScale < 1 ? minScale : 1
 
       this.setState({
         zoom: Math.max(zoom, 0.6),
@@ -84,14 +74,7 @@ class Slide extends Component {
   }
 
   render() {
-    const {
-      children,
-      align,
-      maxHeight,
-      maxWidth,
-      margin,
-      ...rest
-    } = this.props
+    const { children, align, maxHeight, maxWidth, margin, ...rest } = this.props
 
     const { zoom, scale } = this.state
 
@@ -99,7 +82,9 @@ class Slide extends Component {
       <Outer {...rest}>
         <Inner align={align}>
           <Content
-            innerRef={c => { this.contentRef = c }}
+            innerRef={c => {
+              this.contentRef = c
+            }}
             maxHeight={maxHeight}
             maxWidth={maxWidth}
             margin={margin}

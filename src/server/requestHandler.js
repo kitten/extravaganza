@@ -7,7 +7,7 @@ import RedBox from 'redbox-react'
 import InnerApp from '../client/innerApp'
 import makePageTemplate, { makeErrorTemplate } from './pageTemplate'
 
-const prodAssets= ['app.js']
+const prodAssets = ['app.js']
 const devAssets = ['manifest.js', 'commons.js', 'main.js']
 
 const requestHandler = (req, res, { build, production }) => {
@@ -27,12 +27,7 @@ const requestHandler = (req, res, { build, production }) => {
 
     const css = sheet.getStyleTags()
 
-    const html = makePageTemplate(
-      app,
-      css,
-      assets,
-      slideNames
-    )
+    const html = makePageTemplate(app, css, assets, slideNames)
 
     res.status(200).send(html)
   } catch (err) {

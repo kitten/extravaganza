@@ -1,12 +1,7 @@
 import React, { Component } from 'react'
 import styled, { css } from 'styled-components'
 
-import {
-  LiveProvider,
-  LiveEditor,
-  LiveError,
-  LivePreview
-} from 'react-live'
+import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live'
 
 const Wrapper = styled.div`
   height: 100%;
@@ -25,7 +20,7 @@ const Provider = styled(LiveProvider)`
   overflow: hidden;
 
   border: 1px solid #999;
-`;
+`
 
 const Column = styled.div`
   position: relative;
@@ -44,7 +39,7 @@ const Preview = styled(LivePreview)`
   height: 100%;
   background: #fff;
   color: #333;
-`;
+`
 
 const Editor = styled(LiveEditor)`
   padding: 0.5rem;
@@ -68,7 +63,7 @@ const Editor = styled(LiveEditor)`
   background: #263238;
 
   ${p => p.theme.playgroundTheme}
-`;
+`
 
 const Title = styled.div`
   width: 100%;
@@ -90,7 +85,7 @@ const Title = styled.div`
     border-bottom: 1px solid #999;
     color: #424242;
   `}
-`;
+`
 
 const Error = styled(LiveError)`
   position: absolute;
@@ -103,15 +98,9 @@ const Error = styled(LiveError)`
   background: rgba(255, 35, 36, 0.8);
   color: white;
   padding: 0.4rem;
-`;
+`
 
-const PlaygroundSlide = ({
-  textColor,
-  background,
-  noInline,
-  code,
-  scope
-}) => (
+const PlaygroundSlide = ({ textColor, background, noInline, code, scope }) => (
   <Wrapper>
     <Provider
       mountStylesheet={false}

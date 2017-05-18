@@ -11,9 +11,10 @@ import slideManager from './slideManager'
 const node = document.getElementById('root')
 
 slideManager.waitUntilReady().then(() => {
-  render((
+  render(
     <BrowserRouter>
       <App slideManager={slideManager} />
-    </BrowserRouter>
-  ), node)
+    </BrowserRouter>,
+    node
+  )
 })

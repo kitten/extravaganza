@@ -15,7 +15,10 @@ class BuildStats {
 
   getSlides() {
     return this.slides.map(routeName => {
-      const requirePath = resolvePaths(getBuildFolder(true), `dist/${routeName}`)
+      const requirePath = resolvePaths(
+        getBuildFolder(true),
+        `dist/${routeName}`
+      )
       const component = () => {
         const WrappedComponent = require(requirePath).default
         return createElement(WrappedComponent)

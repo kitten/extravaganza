@@ -5,17 +5,18 @@ import Loadable from 'react-loadable'
 import { loadSlide } from './utils/slideLoaders'
 import Loading from './components/loading'
 
-const routeMatchesIndex = index => matchPath(
-  window.location.pathname, { path: `/${index}` }
-) !== null
+const routeMatchesIndex = index =>
+  matchPath(window.location.pathname, { path: `/${index}` }) !== null
 
 const LOCALSTORAGE_KEY = 'extravaganza-state'
 
-const storeState = index => (
-  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({
-    slide: index
-  }))
-)
+const storeState = index =>
+  localStorage.setItem(
+    LOCALSTORAGE_KEY,
+    JSON.stringify({
+      slide: index
+    })
+  )
 
 class SlideManager {
   constructor() {
@@ -39,14 +40,14 @@ class SlideManager {
       slideNames.map(async (routeName, index) => {
         const loader = () => this.loadSlide(routeName)
 
-        const component = (preloadFirst && routeMatchesIndex(index)) ?
-          (await loader()).default :
-          Loadable({
-            loader,
-            resolveModule: module => module.default,
-            LoadingComponent: Loading,
-            delay: 200
-          })
+        const component = preloadFirst && routeMatchesIndex(index)
+          ? (await loader()).default
+          : Loadable({
+              loader,
+              resolveModule: module => module.default,
+              LoadingComponent: Loading,
+              delay: 200
+            })
 
         return {
           component,

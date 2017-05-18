@@ -47,10 +47,7 @@ const Highlight = styled.pre`
 `
 
 class CodeBlock extends Component {
-  html = prism(
-    this.props.code,
-    this.props.language
-  )
+  html = prism(this.props.code, this.props.language)
 
   render() {
     return (

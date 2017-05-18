@@ -21,36 +21,24 @@ const server = async ({ production }) => {
     await build.start(app)
 
     app.get('/sw.js', (req, res) => {
-      res
-        .status(200)
-        .type('application/javascript')
-        .send(emptyServiceWorker)
+      res.status(200).type('application/javascript').send(emptyServiceWorker)
     })
   } else {
     build = new BuildStats()
 
     app.use(
       '/_extravaganza',
-      express.static(
-        getBuildFolder(true),
-        { etag: true }
-      )
+      express.static(getBuildFolder(true), { etag: true })
     )
 
     app.get('/sw.js', (req, res) => {
-      res.sendFile(resolvePaths(
-        getBuildFolder(true),
-        'sw.js'
-      ))
+      res.sendFile(resolvePaths(getBuildFolder(true), 'sw.js'))
     })
   }
 
   app.use(
     '/static',
-    express.static(
-      resolvePaths(getContext(), 'static/'),
-      { etag: true }
-    )
+    express.static(resolvePaths(getContext(), 'static/'), { etag: true })
   )
 
   app.get('*', (req, res) => {

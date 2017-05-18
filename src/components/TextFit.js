@@ -31,7 +31,7 @@ class TextFit extends Component {
 
     textRef.style.display = 'inline-block'
     const scale = containerRef.offsetWidth / textRef.offsetWidth
-    const height = (textRef.offsetHeight * scale) || 0
+    const height = textRef.offsetHeight * scale || 0
     textRef.style.display = 'block'
 
     this.setState({
@@ -59,12 +59,16 @@ class TextFit extends Component {
       <Container
         className={className}
         style={style}
-        innerRef={c => { this.containerRef = c }}
+        innerRef={c => {
+          this.containerRef = c
+        }}
         cssHeight={height}
         {...props}
       >
         <Text
-          innerRef={t => { this.textRef = t }}
+          innerRef={t => {
+            this.textRef = t
+          }}
           scale={scale}
         >
           {children}

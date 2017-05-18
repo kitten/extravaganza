@@ -14,10 +14,10 @@ const View = styled.div`
   align-self: ${p => p.alignSelf || 'auto'};
   flex-wrap: ${p => p.flexWrap || 'no-wrap'};
 
-  top: ${p => p.top ? ensureUnit(p.top) : '0'};
-  right: ${p => p.right ? ensureUnit(p.right) : '0'};
-  bottom: ${p => p.bottom ? ensureUnit(p.bottom) : '0'};
-  left: ${p => p.left ? ensureUnit(p.left) : '0'};
+  top: ${p => (p.top ? ensureUnit(p.top) : '0')};
+  right: ${p => (p.right ? ensureUnit(p.right) : '0')};
+  bottom: ${p => (p.bottom ? ensureUnit(p.bottom) : '0')};
+  left: ${p => (p.left ? ensureUnit(p.left) : '0')};
 
   flex: ${p => p.flex || 'none'};
   flex-basis: ${p => p.flexBasis || 'auto'};

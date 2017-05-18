@@ -7,13 +7,4 @@ import View from './View'
 import CodeBlock from './CodeBlock'
 import List from './List'
 
-export {
-  Slide,
-  PlaygroundSlide,
-  Text,
-  TextFit,
-  Image,
-  View,
-  CodeBlock,
-  List
-}
+export { Slide, PlaygroundSlide, Text, TextFit, Image, View, CodeBlock, List }

@@ -6,9 +6,14 @@ const sanitizeCSS = readFileSync(
   { encoding: 'utf8' }
 )
 
-const injectScripts = names => names.map(name => `
+const injectScripts = names =>
+  names
+    .map(
+      name => `
   <script type="text/javascript" src="/_extravaganza/${name}"></script>
-`).join('\n')
+`
+    )
+    .join('\n')
 
 const makePageTemplate = (html, css, scripts, slideNames) => `
   <html>

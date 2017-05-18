@@ -19,11 +19,6 @@ injectGlobal`
   }
 `
 
-const findSlide = (slides, id) => {
-  const slide = slides.find((_, index) => `${index}` === id)
-  return slide.component
-}
-
 export const InnerApp = ({ slides }) => (
   <ThemeProvider theme={theme}>
     <Switch>
@@ -31,12 +26,14 @@ export const InnerApp = ({ slides }) => (
         strict
         exact
         path="/:id"
-        render={({ match }) => (
-          <SlideTransition
-            id={match.params.id}
-            element={findSlide(slides, match.params.id)}
-          />
-        )}
+        render={({ match }) => {
+          const id = parseInt(match.params.id, 10)
+          if (id < 0 || id >= slides.length || id !== id) {
+            return <Redirect to="/0" />
+          }
+
+          return <SlideTransition id={id} element={slides[id].component} />
+        }}
       />
 
       <Redirect to="/0" />

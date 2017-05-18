@@ -15,11 +15,12 @@ class SlideTransition extends Component {
     }
   }
 
-  transitionIn = ({ id, element }) => {
+  transitionIn = (lastId, { id, element }) => {
     const { styles } = this.state
 
+    const origin = id > lastId ? 1 : -1
     const value = styles[id] === undefined
-      ? new Animated.Value(1)
+      ? new Animated.Value(origin)
       : styles[id].value
 
     const style = makeStyle(element, value)
@@ -33,7 +34,7 @@ class SlideTransition extends Component {
     }))
   }
 
-  transitionOut = id => {
+  transitionOut = (id, nextId) => {
     const { styles } = this.state
     const style = styles[id]
 
@@ -41,7 +42,9 @@ class SlideTransition extends Component {
       return
     }
 
-    Animated.spring(style.value, { toValue: -1 }).start(({ finished }) => {
+    const toValue = id < nextId ? -1 : 1
+
+    Animated.spring(style.value, { toValue }).start(({ finished }) => {
       if (!finished) {
         return
       }
@@ -57,8 +60,8 @@ class SlideTransition extends Component {
       return
     }
 
-    this.transitionIn(nextProps)
-    this.transitionOut(this.props.id)
+    this.transitionIn(this.props.id, nextProps)
+    this.transitionOut(this.props.id, nextProps.id)
   }
 
   render() {

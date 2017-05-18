@@ -2,14 +2,8 @@ import React from 'react'
 import { ThemeProvider, injectGlobal } from 'styled-components'
 import { Route, Redirect, Switch } from 'react-router-dom'
 
-import SlideTransition from './components/slideTransition'
-import Container from './components/container'
-import SlideContainer from './components/slideContainer'
 import theme from 'extravaganza/theme'
-
-const atEnter = { opacity: 0 }
-const atActive = { opacity: 1 }
-const atLeave = { opacity: 0 }
+import SlideTransition from './components/slideTransition'
 
 const googleFontQuery = `${theme.googleFont.name}:${theme.googleFont.weights.join(',')}`
 
@@ -25,28 +19,27 @@ injectGlobal`
   }
 `
 
+const findSlide = (slides, id) => {
+  const slide = slides.find((_, index) => `${index}` === id)
+  return slide.component
+}
+
 export const InnerApp = ({ slides }) => (
   <ThemeProvider theme={theme}>
-    <Route
-      render={({ location }) => (
-        <SlideTransition
-          pathname={location.pathname}
-          atEnter={atEnter}
-          atActive={atActive}
-          atLeave={atLeave}
-          Parent={Container}
-          Child={SlideContainer}
-        >
-          <Switch key={location.key} location={location}>
-            {slides.map(({ component, routeName }, index) => (
-              <Route key={routeName} path={`/${index}`} component={component} />
-            ))}
+    <Switch>
+      <Route
+        strict
+        exact
+        path="/:id"
+        render={({ match }) => (
+          <SlideTransition id={match.params.id}>
+            {findSlide(slides, match.params.id)}
+          </SlideTransition>
+        )}
+      />
 
-            <Redirect to="/0" />
-          </Switch>
-        </SlideTransition>
-      )}
-    />
+      <Redirect to="/0" />
+    </Switch>
   </ThemeProvider>
 )
 

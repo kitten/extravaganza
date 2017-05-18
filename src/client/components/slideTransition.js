@@ -6,6 +6,7 @@ import SlideContainer from './slideContainer'
 
 const makeStyle = (element, value) => ({ element, value })
 const findStyle = (styles, id) => styles.find(x => x.id === id)
+const springConfig = { friction: 10, tension: 35 }
 
 class SlideTransition extends Component {
   state = {
@@ -26,7 +27,7 @@ class SlideTransition extends Component {
     const style = makeStyle(element, value)
 
     setTimeout(() => {
-      Animated.spring(value, { toValue: 0 }).start()
+      Animated.spring(value, { ...springConfig, toValue: 0 }).start()
     })
 
     this.setState(({ styles }) => ({
@@ -44,7 +45,10 @@ class SlideTransition extends Component {
 
     const toValue = id < nextId ? -1 : 1
 
-    Animated.spring(style.value, { toValue }).start(({ finished }) => {
+    Animated.spring(style.value, {
+      ...springConfig,
+      toValue
+    }).start(({ finished }) => {
       if (!finished) {
         return
       }

@@ -5,7 +5,6 @@ import Container from './container'
 import SlideContainer from './slideContainer'
 
 const makeStyle = (element, value) => ({ element, value })
-const findStyle = (styles, id) => styles.find(x => x.id === id)
 const springConfig = { friction: 10, tension: 35 }
 
 class SlideTransition extends Component {
@@ -60,12 +59,23 @@ class SlideTransition extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.id === this.props.id) {
+    const { id, element } = nextProps
+
+    if (element !== this.props.element) {
+      this.setState(({ styles }) => ({
+        styles: {
+          ...styles,
+          [id]: { ...styles[id], element }
+        }
+      }))
+    }
+
+    if (id === this.props.id) {
       return
     }
 
     this.transitionIn(this.props.id, nextProps)
-    this.transitionOut(this.props.id, nextProps.id)
+    this.transitionOut(this.props.id, id)
   }
 
   render() {

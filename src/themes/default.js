@@ -12,5 +12,6 @@ module.exports = {
     secondary: '#F3B661'
   },
   codeBlockTheme: prismLight,
-  playgroundTheme: prismDark
+  playgroundTheme: prismDark,
+  transitions: ['fade']
 }

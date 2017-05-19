@@ -1,44 +1,51 @@
-import React from 'react'
-import { ThemeProvider, injectGlobal } from 'styled-components'
+import React, { Component } from 'react'
+import { withTheme, injectGlobal } from 'styled-components'
 import { Route, Redirect, Switch } from 'react-router-dom'
 
-import theme from 'extravaganza/theme'
 import SlideTransition from './components/slideTransition'
 
-const googleFontQuery = `${theme.googleFont.name}:${theme.googleFont.weights.join(',')}`
+class InnerApp extends Component {
+  componentWillMount() {
+    const { theme } = this.props
 
-injectGlobal`
-  @import url('https://fonts.googleapis.com/css?family=${googleFontQuery}');
+    const googleFontQuery = `${theme.googleFont.name}:${theme.googleFont.weights.join(',')}`
 
-  html, body {
-    font-family: ${theme.googleFont.name}, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    background: ${theme.colors.background};
-    color: ${theme.colors.primary};
-    font-size: 1.8em;
-    overflow: hidden;
+    injectGlobal`
+      @import url('https://fonts.googleapis.com/css?family=${googleFontQuery}');
+
+      html, body {
+        font-family: ${theme.googleFont.name}, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        background: ${theme.colors.background};
+        color: ${theme.colors.primary};
+        font-size: 1.8em;
+        overflow: hidden;
+      }
+    `
   }
-`
 
-export const InnerApp = ({ slides }) => (
-  <ThemeProvider theme={theme}>
-    <Switch>
-      <Route
-        strict
-        exact
-        path="/:id"
-        render={({ match }) => {
-          const id = parseInt(match.params.id, 10)
-          if (id < 0 || id >= slides.length || id !== id) {
-            return <Redirect to="/0" />
-          }
+  render() {
+    const { slides } = this.props
 
-          return <SlideTransition id={id} element={slides[id].component} />
-        }}
-      />
+    return (
+      <Switch>
+        <Route
+          strict
+          exact
+          path="/:id"
+          render={({ match }) => {
+            const id = parseInt(match.params.id, 10)
+            if (id < 0 || id >= slides.length || id !== id) {
+              return <Redirect to="/0" />
+            }
 
-      <Redirect to="/0" />
-    </Switch>
-  </ThemeProvider>
-)
+            return <SlideTransition id={id} element={slides[id].component} />
+          }}
+        />
 
-export default InnerApp
+        <Redirect to="/0" />
+      </Switch>
+    )
+  }
+}
+
+export default withTheme(InnerApp)

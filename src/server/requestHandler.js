@@ -1,16 +1,19 @@
 import React from 'react'
 import { renderToString } from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom'
-import { ServerStyleSheet } from 'styled-components'
+import { ThemeProvider, ServerStyleSheet } from 'styled-components'
 import RedBox from 'redbox-react'
 
 import InnerApp from '../client/innerApp'
 import makePageTemplate, { makeErrorTemplate } from './pageTemplate'
+import { getTheme } from '../user/server'
 
 const prodAssets = ['app.js']
 const devAssets = ['manifest.js', 'commons.js', 'main.js']
 
 const requestHandler = (req, res, { build, production }) => {
+  const theme = getTheme()
+
   try {
     const assets = production ? prodAssets : devAssets
     const slideNames = build.getSlideNames()
@@ -19,9 +22,11 @@ const requestHandler = (req, res, { build, production }) => {
 
     const app = renderToString(
       sheet.collectStyles(
-        <StaticRouter location={req.url} context={{}}>
-          <InnerApp slides={slides} />
-        </StaticRouter>
+        <ThemeProvider theme={theme}>
+          <StaticRouter location={req.url} context={{}}>
+            <InnerApp slides={slides} />
+          </StaticRouter>
+        </ThemeProvider>
       )
     )
 

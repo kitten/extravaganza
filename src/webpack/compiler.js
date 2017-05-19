@@ -15,7 +15,6 @@ import WatchSlidesPlugin from './plugins/watchSlidesPlugin'
 import CombineAssetsPlugin from './plugins/combineAssetsPlugin'
 import findBabelConfig from './babel/findConfig'
 import findSlides from './utils/findSlides'
-import alias from './alias'
 
 import {
   getContext,
@@ -212,10 +211,6 @@ const makeCompiler = async ({ production }) => {
     ),
 
     stats: true
-  }
-
-  if (production) {
-    Object.assign(config.resolve.alias, alias)
   }
 
   await rm(getBuildFolder(production))

@@ -1,5 +1,3 @@
-import './moduleAlias'
-
 import express from 'express'
 import compression from 'compression'
 import BuildStats from './buildStats'

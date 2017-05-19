@@ -25,9 +25,7 @@ class SlideTransition extends Component {
 
     const style = makeStyle(element, value)
 
-    setTimeout(() => {
-      Animated.spring(value, { ...springConfig, toValue: 0 }).start()
-    })
+    Animated.spring(value, { ...springConfig, toValue: 0 }).start()
 
     this.setState(({ styles }) => ({
       styles: { ...styles, [id]: style }

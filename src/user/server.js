@@ -2,7 +2,8 @@ import { relative, join } from 'path'
 
 import { getConfig, getContext, getBuildFolder, getThemePath } from './config'
 
-const distFolder = join(getBuildFolder(), 'dist/')
+const isProd = process.env.NODE_ENV === 'production'
+const distFolder = join(getBuildFolder(isProd), 'dist/')
 
 export const getTheme = () => {
   const { themePath } = getConfig()

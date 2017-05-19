@@ -15,6 +15,7 @@ import WatchSlidesPlugin from './plugins/watchSlidesPlugin'
 import CombineAssetsPlugin from './plugins/combineAssetsPlugin'
 import findBabelConfig from './babel/findConfig'
 import findSlides from './utils/findSlides'
+import alias from './alias'
 
 import {
   getContext,
@@ -214,12 +215,7 @@ const makeCompiler = async ({ production }) => {
   }
 
   if (production) {
-    config.resolve.alias.react = require.resolve(
-      'preact-compat/dist/preact-compat'
-    )
-    config.resolve.alias['react-dom'] = require.resolve(
-      'preact-compat/dist/preact-compat'
-    )
+    Object.assign(config.resolve.alias, alias)
   }
 
   await rm(getBuildFolder(production))

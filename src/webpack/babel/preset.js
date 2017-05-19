@@ -1,15 +1,22 @@
 module.exports = {
   presets: [
-    [require.resolve('babel-preset-env'), {
-      loose: true
-    }],
+    [
+      require.resolve('babel-preset-env'),
+      {
+        loose: true,
+        modules: false
+      }
+    ],
     require.resolve('babel-preset-react')
   ],
   plugins: [
-    [require.resolve('babel-plugin-styled-components'), {
-      ssr: true,
-      minify: true
-    }],
+    [
+      require.resolve('babel-plugin-styled-components'),
+      {
+        ssr: true,
+        minify: true
+      }
+    ],
 
     require.resolve('babel-plugin-polished'),
     require.resolve('babel-plugin-transform-object-rest-spread'),

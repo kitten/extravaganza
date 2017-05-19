@@ -1,7 +1,8 @@
 {
   "presets": [
     ["env", {
-      "loose": true
+      "loose": true,
+      "modules": "commonjs"
     }],
     "react"
   ],

@@ -2,8 +2,16 @@
 // https://github.com/zeit/next.js/blob/master/server/build/loaders/emit-file-loader.js
 
 import loaderUtils from 'loader-utils'
+import { transform } from 'babel-core'
 
-module.exports = function emitFileLoader (content, sourceMap) {
+const transpile = content =>
+  transform(content, {
+    babelrc: false,
+    sourceMaps: false,
+    plugins: [require.resolve('babel-plugin-transform-es2015-modules-commonjs')]
+  }).code
+
+module.exports = function emitFileLoader(content, sourceMap) {
   this.cacheable()
 
   const name = 'dist/[path][name].[ext]'
@@ -14,7 +22,12 @@ module.exports = function emitFileLoader (content, sourceMap) {
     content
   })
 
+  let newContent = content
+  if (interpolatedName.endsWith('.js')) {
+    newContent = transpile(content)
+  }
+
   // Emit file to separate dist/ folder and pass the input on unchanged
-  this.emitFile(interpolatedName, content, sourceMap)
+  this.emitFile(interpolatedName, newContent)
   this.callback(null, content, sourceMap)
 }

@@ -15,7 +15,6 @@ const Text = styled.span`
   font-size: 16px;
   margin: 0;
   padding: 0;
-  line-height: ${p => p.lineHeight || 1};
   transform: scale(${p => p.scale});
   transform-origin: center top;
 `

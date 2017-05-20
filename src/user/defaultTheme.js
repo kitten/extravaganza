@@ -4,6 +4,7 @@ import prismDark from './prism/dark'
 module.exports = {
   slide: {
     aspectRatio: 4 / 3,
+    fontRatio: 'perfectFourth',
     padding: 50
   },
   googleFont: {

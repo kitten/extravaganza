@@ -1,13 +1,9 @@
 import React, { Component } from 'react'
 import styled, { css } from 'styled-components'
 
+import base, { baseFontSize } from './base'
+import Slide from './Slide'
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live'
-
-const Wrapper = styled.div`
-  height: 100%;
-  width: 100%;
-  padding: 2rem;
-`
 
 const Provider = styled(LiveProvider)`
   display: flex;
@@ -19,7 +15,10 @@ const Provider = styled(LiveProvider)`
   border-radius: 6px;
   overflow: hidden;
 
-  border: 1px solid #999;
+  ${base}
+  ${baseFontSize(-2)}
+
+  border: 1px solid rgba(0, 0, 0, 0.3);
 `
 
 const Column = styled.div`
@@ -30,7 +29,7 @@ const Column = styled.div`
   flex-shrink: 0;
 
   &:last-child {
-    border-left: 1px solid #333;
+    border-left: 1px solid rgba(0, 0, 0, 0.3);
   }
 `
 
@@ -39,13 +38,13 @@ const Preview = styled(LivePreview)`
   height: 100%;
   background: #fff;
   color: #333;
+  overflow-y: scroll;
 `
 
 const Editor = styled(LiveEditor)`
   padding: 0.5rem;
   margin: 0;
   min-height: 100%;
-  font-size: 1.15vw;
 
   white-space: pre-wrap;
   box-sizing: border-box;
@@ -58,6 +57,7 @@ const Editor = styled(LiveEditor)`
   text-align: left;
   word-spacing: normal;
   tab-size: 2;
+  overflow-y: scroll;
 
   color: rgba(233, 237, 237, 1);
   background: #263238;
@@ -67,18 +67,13 @@ const Editor = styled(LiveEditor)`
 
 const Title = styled.div`
   width: 100%;
-  height: 1.7rem;
-  line-height: 1.7rem;
-  vertical-align: middle;
 
   background: #272822;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   color: #fff;
 
   display: block;
-  font-size: 0.8rem;
-  padding: 0 0.4rem;
-  text-transform: uppercase;
+  padding: 0.2em 0;
 
   ${p => p.light && css`
     background: #ddd;
@@ -93,7 +88,6 @@ const Error = styled(LiveError)`
   width: 100%;
   text-align: left;
   white-space: pre-wrap;
-  font-size: 1vw;
 
   background: rgba(255, 35, 36, 0.8);
   color: white;
@@ -101,7 +95,7 @@ const Error = styled(LiveError)`
 `
 
 const PlaygroundSlide = ({ textColor, background, noInline, code, scope }) => (
-  <Wrapper>
+  <Slide>
     <Provider
       mountStylesheet={false}
       code={code.trim()}
@@ -119,7 +113,7 @@ const PlaygroundSlide = ({ textColor, background, noInline, code, scope }) => (
         <Editor />
       </Column>
     </Provider>
-  </Wrapper>
+  </Slide>
 )
 
 export default PlaygroundSlide

@@ -2,6 +2,10 @@ import prismLight from './prism/light'
 import prismDark from './prism/dark'
 
 module.exports = {
+  slide: {
+    aspectRatio: 4 / 3,
+    padding: 50
+  },
   googleFont: {
     name: 'Montserrat',
     weights: [400, 600]

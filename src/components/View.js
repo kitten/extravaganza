@@ -1,11 +1,13 @@
 import styled from 'styled-components'
 
 import base from './base'
+import flex from './flex'
 import ensureUnit from './utils/ensureUnit'
 
 const View = styled.div`
   position: ${p => p.position || 'relative'};
-  display: flex;
+
+  ${flex('row')}
 
   flex-direction: ${p => p.flexDirection || 'row'};
   justify-content: ${p => p.justifyContent || 'center'};

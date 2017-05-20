@@ -1,102 +1,94 @@
 import React, { Component } from 'react'
-import styled, { css } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 
-import base from './base'
+import base, { getBaseProps } from './base'
+import flex, { getFlexProps } from './flex'
 import ensureUnit from './utils/ensureUnit'
 
-const Outer = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
+const baseHeight = 1080
+
+const Wrapper = styled.div`
+  position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  overflow: hidden;
 
   ${base}
 
   background: ${p => p.background || p.theme.colors.background};
 `
 
-const Inner = styled.div`
-  display: flex;
-  position: relative;
-  flex: 1;
-
-  align-items: ${p => (p.align ? p.align.split(' ')[1] : 'center')};
-
-  justify-content: ${p => (p.align ? p.align.split(' ')[0] : 'center')};
-`
-
 const Content = styled.div`
-  flex: 1;
-  max-height: ${p => (p.maxHeight ? ensureUnit(p.maxHeight) : '700px')};
-  max-width: ${p => (p.maxWidth ? ensureUnit(p.maxWidth) : '1000px')};
-  transform: scale(${p => p.scale});
-  padding: ${p => ensureUnit(p.zoom > 0.6 ? p.margin || 40 : 10)};
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  height: ${baseHeight}px;
+  width: ${p => (p.theme.slide.aspectRatio || 4 / 3) * baseHeight}px;
+  padding: ${p => ensureUnit(p.theme.slide.padding || 50)};
+  overflow: hidden;
   text-align: center;
+
+  transform-origin: 50% 50%;
+  transform: translate(-50%, -50%) scale(${p => p.scale});
+
+  ${flex('column')}
 `
 
 class Slide extends Component {
-  state = {
-    scale: 1,
-    zoom: 1
+  state = { scale: 1 }
+
+  saveContentRef = node => {
+    this.contentRef = node
   }
 
-  zoom = () => {
-    const mobile = window.matchMedia('(max-width: 628px)').matches
-    const content = this.contentRef
+  fit = () => {
+    const { contentRef } = this
 
-    if (content) {
-      const zoom = content.offsetWidth / 1000
-
-      const contentScaleY = content.parentNode.offsetHeight / 700
-      const contentScaleX = content.parentNode.offsetWidth / 700
-      const minScale = Math.min(contentScaleY, contentScaleX)
-      const scale = mobile ? 1 : minScale < 1 ? minScale : 1
-
-      this.setState({
-        zoom: Math.max(zoom, 0.6),
-        scale
-      })
+    if (contentRef === null || contentRef === undefined) {
+      return
     }
+
+    const { aspectRatio } = this.props.theme
+    const baseWidth = (aspectRatio || 4 / 3) * baseHeight
+
+    const outerWidth = contentRef.parentNode.offsetWidth
+    const outerHeight = contentRef.parentNode.offsetHeight
+    const isLandscape = outerWidth > outerHeight
+
+    const scale = isLandscape
+      ? outerHeight / baseHeight
+      : outerWidth / baseWidth
+
+    this.setState({ scale })
   }
 
   componentDidMount() {
-    this.zoom()
-    window.addEventListener('load', this.zoom)
-    window.addEventListener('resize', this.zoom)
+    this.fit()
+    window.addEventListener('load', this.fit)
+    window.addEventListener('resize', this.fit)
   }
 
   componentWillUnmount() {
-    window.removeEventListener('load', this.zoom)
-    window.removeEventListener('resize', this.zoom)
+    window.removeEventListener('load', this.fit)
+    window.removeEventListener('resize', this.fit)
   }
 
   render() {
-    const { children, align, maxHeight, maxWidth, margin, ...rest } = this.props
-
-    const { zoom, scale } = this.state
+    const { children } = this.props
+    const { scale } = this.state
 
     return (
-      <Outer {...rest}>
-        <Inner align={align}>
-          <Content
-            innerRef={c => {
-              this.contentRef = c
-            }}
-            maxHeight={maxHeight}
-            maxWidth={maxWidth}
-            margin={margin}
-            scale={scale}
-            zoom={zoom}
-          >
-            {children}
-          </Content>
-        </Inner>
-      </Outer>
+      <Wrapper {...getBaseProps(this.props)}>
+        <Content
+          innerRef={this.saveContentRef}
+          scale={scale}
+          {...getFlexProps(this.props)}
+        >
+          {children}
+        </Content>
+      </Wrapper>
     )
   }
 }
 
-export default Slide
+export default withTheme(Slide)

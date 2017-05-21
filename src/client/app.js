@@ -9,11 +9,18 @@ class App extends Component {
     slides: this.props.slideManager.getSlides()
   }
 
-  handleKey = ({ keyCode }) => {
+  handleKey = evt => {
+    const { slideManager } = this.props
+    const { keyCode, altKey, ctrlKey, metaKey } = evt
+
     if (nextSlideKeys.includes(keyCode)) {
-      this.props.slideManager.gotoNext()
+      slideManager.gotoNext()
     } else if (prevSlideKeys.includes(keyCode)) {
-      this.props.slideManager.gotoPrev()
+      slideManager.gotoPrev()
+    }
+
+    if (altKey && keyCode === 80 && !ctrlKey && !metaKey) {
+      slideManager.togglePresenterMode()
     }
   }
 

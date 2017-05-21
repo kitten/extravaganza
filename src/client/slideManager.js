@@ -104,6 +104,13 @@ class SlideManager {
     }
   }
 
+  togglePresenterMode() {
+    const { id, mode } = getActiveState(this.slides.length)
+    const nextPath = mode === 'presenter' ? '' : '/presenter'
+
+    history.push(`${nextPath}/${id}`)
+  }
+
   updateState({ key, newValue }) {
     if (key === LOCALSTORAGE_KEY) {
       const { slide } = JSON.parse(newValue)

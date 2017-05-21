@@ -25,8 +25,9 @@ const SlideContainer = styled.div`
 
   background: ${p => p.theme.colors.background};
   color: ${p => p.theme.colors.primary};
+  border: 1px solid ${p => p.theme.colors.background};
 
-  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.35);
   border-radius: 3px;
   overflow: hidden;
 

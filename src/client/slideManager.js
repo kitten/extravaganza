@@ -1,17 +1,10 @@
 import mitt from 'mitt'
-import { matchPath } from 'react-router-dom'
 import Loadable from 'react-loadable'
 
 import history from './history'
+import { getActiveState, getActiveSlideId } from './utils/currentSlide'
 import { loadSlide } from './utils/slideLoaders'
 import Loading from './components/loading'
-
-const routeMatchesIndex = index =>
-  matchPath(window.location.pathname, {
-    path: `/${index}`,
-    exact: true,
-    strict: true
-  }) !== null
 
 const LOCALSTORAGE_KEY = 'extravaganza-state'
 
@@ -41,11 +34,13 @@ class SlideManager {
   prepareSlides(slideNames, preloadFirst = false) {
     this.isReady = false
 
+    const activeSlideId = getActiveSlideId(slideNames.length)
+
     return Promise.all(
       slideNames.map(async (routeName, index) => {
         const loader = () => this.loadSlide(routeName)
 
-        const component = preloadFirst && routeMatchesIndex(index)
+        const component = preloadFirst && activeSlideId === index
           ? (await loader()).default
           : Loadable({
               loader,
@@ -54,10 +49,7 @@ class SlideManager {
               delay: 200
             })
 
-        return {
-          component,
-          routeName
-        }
+        return component
       })
     ).then(slides => {
       this.slides = slides
@@ -87,45 +79,40 @@ class SlideManager {
     }
   }
 
-  getActiveSlide() {
-    const index = this.slides.findIndex((_, index) => routeMatchesIndex(index))
-    return index
-  }
-
   gotoNext() {
-    const index = this.getActiveSlide()
-    const nextIndex = index + 1
+    const { id, path } = getActiveState(this.slides.length)
+    const nextId = id === undefined ? 0 : id + 1
 
-    if (nextIndex < this.slides.length) {
-      history.push(`/${nextIndex}`)
-      this.preload(nextIndex + 1)
-      storeState(nextIndex)
+    if (nextId < this.slides.length) {
+      history.push(`${path}/${nextId}`)
+      this.preload(nextId + 1)
+      storeState(nextId)
     }
   }
 
   gotoPrev() {
-    const index = this.getActiveSlide()
-    const nextIndex = index - 1
+    const { id, path } = getActiveState(this.slides.length)
+    const nextId = id === undefined ? 0 : id - 1
 
-    if (nextIndex >= 0) {
-      history.push(`/${nextIndex}`)
-      this.preload(nextIndex - 1)
-      storeState(nextIndex)
+    if (nextId >= 0) {
+      history.push(`${path}/${nextId}`)
+      this.preload(nextId - 1)
+      storeState(nextId)
     }
   }
 
   updateState({ key, newValue }) {
     if (key === LOCALSTORAGE_KEY) {
       const { slide } = JSON.parse(newValue)
-      const index = this.getActiveSlide()
+      const { id, path } = getActiveState(this.slides.length)
 
       if (
         typeof slide === 'number' &&
         slide >= 0 &&
         slide < this.slides.length &&
-        slide !== index
+        slide !== id
       ) {
-        history.push(`/${slide}`)
+        history.push(`${path}/${slide}`)
       }
     }
   }

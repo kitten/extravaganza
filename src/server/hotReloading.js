@@ -98,15 +98,13 @@ class HotReloading {
         getBuildFolder(false),
         `dist/${routeName}`
       )
+
       const component = () => {
         const WrappedComponent = require(requirePath).default
         return createElement(WrappedComponent)
       }
 
-      return {
-        component,
-        routeName
-      }
+      return component
     })
   }
 }

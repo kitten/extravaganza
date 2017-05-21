@@ -17,10 +17,10 @@ class App extends Component {
       slideManager.gotoNext()
     } else if (prevSlideKeys.includes(keyCode)) {
       slideManager.gotoPrev()
-    }
-
-    if (altKey && keyCode === 80 && !ctrlKey && !metaKey) {
+    } else if (altKey && keyCode === 80 && !ctrlKey && !metaKey) {
       slideManager.togglePresenterMode()
+    } else if (altKey && keyCode === 79 && !ctrlKey && !metaKey) {
+      slideManager.openOverview()
     }
   }
 

@@ -1,6 +1,5 @@
 import React, { createElement } from 'react'
 import styled from 'styled-components'
-import rem from 'polished/lib/helpers/rem'
 
 const Wrapper = styled.div`
   position: absolute;

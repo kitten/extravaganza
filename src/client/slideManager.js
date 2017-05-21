@@ -111,6 +111,14 @@ class SlideManager {
     history.push(`${nextPath}/${id}`)
   }
 
+  openOverview() {
+    const state = getActiveState()
+
+    if (state !== undefined) {
+      history.push('/overview')
+    }
+  }
+
   updateState({ key, newValue }) {
     if (key === LOCALSTORAGE_KEY) {
       const { slide } = JSON.parse(newValue)

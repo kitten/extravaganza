@@ -31,25 +31,28 @@ class SlideManager {
     return this.ready$
   }
 
-  prepareSlides(slideNames, preloadFirst = false) {
+  prepareSlides(slideNames, preload = false) {
     this.isReady = false
 
-    const activeSlideId = getActiveSlideId(slideNames.length)
+    const { id = -1, mode } = getActiveState(slideNames.length) || {}
 
     return Promise.all(
       slideNames.map(async (routeName, index) => {
         const loader = () => this.loadSlide(routeName)
 
-        const component = preloadFirst && activeSlideId === index
-          ? (await loader()).default
-          : Loadable({
-              loader,
-              resolveModule: module => module.default,
-              LoadingComponent: Loading,
-              delay: 200
-            })
+        if (
+          preload &&
+          (index === id || (mode === 'presenter' && index === id + 1))
+        ) {
+          return (await loader()).default
+        }
 
-        return component
+        return Loadable({
+          loader,
+          resolveModule: module => module.default,
+          LoadingComponent: Loading,
+          delay: 200
+        })
       })
     ).then(slides => {
       this.slides = slides

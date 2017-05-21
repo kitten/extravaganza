@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { withTheme, injectGlobal } from 'styled-components'
 import { Route, Redirect, Switch } from 'react-router-dom'
 
+import Overview from './components/overview'
 import PresenterView from './components/presenterView'
 import SlideTransition from './components/slideTransition'
 import parseId from './utils/parseId'
@@ -20,7 +21,6 @@ class InnerApp extends Component {
         background: ${theme.colors.background};
         color: ${theme.colors.primary};
         font-size: 50px;
-        overflow: hidden;
       }
     `
   }
@@ -35,6 +35,13 @@ class InnerApp extends Component {
 
     return (
       <Switch>
+        <Route
+          strict
+          exact
+          path="/overview"
+          render={() => <Overview slides={slides} />}
+        />
+
         <Route
           strict
           exact

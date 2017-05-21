@@ -42,7 +42,9 @@ class SlideManager {
 
         if (
           preload &&
-          (index === id || (mode === 'presenter' && index === id + 1))
+          (index === id ||
+            mode === 'overview' ||
+            (mode === 'presenter' && index === id + 1))
         ) {
           return (await loader()).default
         }
@@ -104,11 +106,24 @@ class SlideManager {
     }
   }
 
+  goto(id) {
+    history.push(`/${id}`)
+    storeState(id)
+  }
+
   togglePresenterMode() {
     const { id, mode } = getActiveState(this.slides.length)
     const nextPath = mode === 'presenter' ? '' : '/presenter'
 
     history.push(`${nextPath}/${id}`)
+  }
+
+  openOverview() {
+    const state = getActiveState()
+
+    if (state !== undefined) {
+      history.push('/overview')
+    }
   }
 
   updateState({ key, newValue }) {

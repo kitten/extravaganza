@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import { withTheme, injectGlobal } from 'styled-components'
 import { Route, Redirect, Switch } from 'react-router-dom'
 
+import PresenterView from './components/presenterView'
 import SlideTransition from './components/slideTransition'
+import parseId from './utils/parseId'
 
 class InnerApp extends Component {
   componentWillMount() {
@@ -23,6 +25,11 @@ class InnerApp extends Component {
     `
   }
 
+  parseId = matchedStr => {
+    const { slides } = this.props
+    return parseId(slides.length, matchedStr)
+  }
+
   render() {
     const { slides } = this.props
 
@@ -31,14 +38,28 @@ class InnerApp extends Component {
         <Route
           strict
           exact
+          path="/presenter/:id"
+          render={({ match }) => {
+            const id = this.parseId(match.params.id)
+            if (id === undefined) {
+              return <Redirect to="/presenter/0" />
+            }
+
+            return <PresenterView id={id} slides={slides} />
+          }}
+        />
+
+        <Route
+          strict
+          exact
           path="/:id"
           render={({ match }) => {
-            const id = parseInt(match.params.id, 10)
-            if (id < 0 || id >= slides.length || id !== id) {
+            const id = this.parseId(match.params.id)
+            if (id === undefined) {
               return <Redirect to="/0" />
             }
 
-            return <SlideTransition id={id} element={slides[id].component} />
+            return <SlideTransition id={id} element={slides[id]} />
           }}
         />
 

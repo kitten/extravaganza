@@ -24,10 +24,7 @@ class BuildStats {
         return createElement(WrappedComponent)
       }
 
-      return {
-        component,
-        routeName
-      }
+      return component
     })
   }
 }

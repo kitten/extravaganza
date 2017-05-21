@@ -1,5 +1,6 @@
 import React, { createElement } from 'react'
 import styled from 'styled-components'
+import history from './history'
 
 const Wrapper = styled.div`
   background: #1e2526;
@@ -9,7 +10,7 @@ const Wrapper = styled.div`
   flex-wrap: wrap;
 `
 
-const SlideContainer = styled.a`
+const SlideContainer = styled.div`
   display: block;
   position: relative;
 
@@ -25,6 +26,7 @@ const SlideContainer = styled.a`
   margin: 20px;
 
   cursor: pointer;
+  pointer-events: none;
   transition: transform 0.15s ease-in-out;
 
   &:hover {
@@ -35,7 +37,7 @@ const SlideContainer = styled.a`
 const Overview = ({ slides }) => (
   <Wrapper>
     {slides.map((component, index) => (
-      <SlideContainer href={`/${index}`} key={index}>
+      <SlideContainer onClick={() => history.push(`/${index}`)} key={index}>
         {createElement(component)}
       </SlideContainer>
     ))}

@@ -42,7 +42,9 @@ class SlideManager {
 
         if (
           preload &&
-          (index === id || (mode === 'presenter' && index === id + 1))
+          (index === id ||
+            mode === 'overview' ||
+            (mode === 'presenter' && index === id + 1))
         ) {
           return (await loader()).default
         }
@@ -102,6 +104,11 @@ class SlideManager {
       this.preload(nextId - 1)
       storeState(nextId)
     }
+  }
+
+  goto(id) {
+    history.push(`/${id}`)
+    storeState(id)
   }
 
   togglePresenterMode() {

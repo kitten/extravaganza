@@ -1,6 +1,6 @@
 import React, { createElement } from 'react'
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import history from './history'
 
 const Wrapper = styled.div`
   background: #1e2526;
@@ -10,8 +10,17 @@ const Wrapper = styled.div`
   flex-wrap: wrap;
 `
 
+const Link = styled.div`
+  margin: 20px;
+  cursor: pointer;
+  transition: transform 0.15s ease-in-out;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`
+
 const SlideContainer = styled.div`
-  display: block;
   position: relative;
 
   background: ${p => p.theme.colors.background};
@@ -23,25 +32,23 @@ const SlideContainer = styled.div`
 
   width: 22vw;
   height: 12.375vw;
-  margin: 20px;
-
-  cursor: pointer;
   pointer-events: none;
-  transition: transform 0.15s ease-in-out;
-
-  &:hover {
-    transform: scale(1.05);
-  }
 `
 
-const Overview = ({ slides }) => (
+const Overview = ({ slides }, { slideManager }) => (
   <Wrapper>
     {slides.map((component, index) => (
-      <SlideContainer onClick={() => history.push(`/${index}`)} key={index}>
-        {createElement(component)}
-      </SlideContainer>
+      <Link onClick={() => slideManager.goto(index)} key={index}>
+        <SlideContainer>
+          {createElement(component)}
+        </SlideContainer>
+      </Link>
     ))}
   </Wrapper>
 )
+
+Overview.contextTypes = {
+  slideManager: PropTypes.object
+}
 
 export default Overview

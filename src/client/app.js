@@ -1,10 +1,16 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import InnerApp from './innerApp'
+import history from './history'
 
 const prevSlideKeys = [37, 33]
 const nextSlideKeys = [39, 34, 32]
 
 class App extends Component {
+  static childContextTypes = {
+    slideManager: PropTypes.object
+  }
+
   state = {
     slides: this.props.slideManager.getSlides()
   }
@@ -37,6 +43,10 @@ class App extends Component {
 
   updateSlide = evt => {
     this.props.slideManager.updateState(evt)
+  }
+
+  getChildContext() {
+    return { slideManager: this.props.slideManager }
   }
 
   componentDidMount() {

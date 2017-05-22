@@ -20,7 +20,8 @@ class SuppressEntryChunksPlugin {
 
       const slideChunks = getSlideChunks(compilation.chunks)
       const slides = Object.keys(slideChunks)
-      const slidesJSON = JSON.stringify(slides)
+      const slideAssetIds = slides.map(key => slideChunks[key].ids[1])
+      const slidesJSON = JSON.stringify({ slides, slideAssetIds })
 
       compilation.assets['assets.json'] = {
         source: () => slidesJSON,

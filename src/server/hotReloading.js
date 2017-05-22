@@ -16,6 +16,7 @@ class HotReloading {
   constructor() {
     this.success = false
     this.slides = []
+    this.slideAssetIds = []
   }
 
   prepareMiddleware(app) {
@@ -45,6 +46,7 @@ class HotReloading {
       const { compilation: { chunks } } = stats
       const slideChunks = getSlideChunks(chunks)
       const slides = Object.keys(slideChunks)
+      const slideAssetIds = slides.map(key => slideChunks[key].ids[1])
       const slidesKey = slides.join()
 
       if (this.success && slidesKey !== this.prevSlidesKey) {
@@ -57,6 +59,7 @@ class HotReloading {
 
       this.prevSlidesKey = slidesKey
       this.slides = slides
+      this.slideAssetIds = slideAssetIds
       this.success = true
     })
 
@@ -89,6 +92,10 @@ class HotReloading {
 
   getSlideNames() {
     return this.slides.map(x => x.replace('slides/', ''))
+  }
+
+  getSlideAssets() {
+    return this.slideAssetIds.map(id => `chunk/${id}.js`)
   }
 
   getSlides() {

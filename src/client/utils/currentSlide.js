@@ -5,9 +5,7 @@ const overviewPath = { path: '/overview', exact: true, strict: true }
 const slidePath = { path: '/:id', exact: true, strict: true }
 const presenterPath = { path: '/presenter/:id', exact: true, strict: true }
 
-export const getActiveState = maxSlides => {
-  const { pathname } = window.location
-
+export const getActiveState = (pathname, maxSlides) => {
   let mode
   let id
 
@@ -34,10 +32,4 @@ export const getActiveState = maxSlides => {
   const path = mode !== undefined ? `/${mode}` : ''
 
   return { id, mode, path }
-}
-
-export const getActiveSlideId = maxSlides => {
-  const state = getActiveState(maxSlides)
-
-  return state === undefined ? undefined : state.id
 }

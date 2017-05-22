@@ -5,8 +5,8 @@ import sort from 'alphanum-sort'
 
 import { getBuildFolder } from '../user/config'
 import resolvePaths from '../utils/resolvePaths'
-import filterSlideChunks from '../utils/filterSlideChunks'
 import webpackCompiler from '../webpack/compiler'
+import getSlideChunks from '../webpack/utils/getSlideChunks'
 
 const deleteCache = path => {
   delete require.cache[path]
@@ -43,9 +43,8 @@ class HotReloading {
       this.stats = stats // Update internal stats
 
       const { compilation: { chunks } } = stats
-
-      const slides = sort(filterSlideChunks(chunks.map(x => x.name)))
-
+      const slideChunks = getSlideChunks(chunks)
+      const slides = Object.keys(slideChunks)
       const slidesKey = slides.join()
 
       if (this.success && slidesKey !== this.prevSlidesKey) {

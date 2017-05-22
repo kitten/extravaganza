@@ -1,13 +1,13 @@
 import sort from 'alphanum-sort'
 
-import findSlides from '../utils/findSlides'
+import getSlideChunks from '../utils/getSlideChunks'
 
 class SuppressEntryChunksPlugin {
   constructor() {
     this.skip = /^slides\//
   }
 
-  apply (compiler) {
+  apply(compiler) {
     compiler.plugin('after-compile', (compilation, callback) => {
       compilation.chunks.forEach(chunk => {
         if (chunk.name && this.skip.test(chunk.name)) {
@@ -18,16 +18,16 @@ class SuppressEntryChunksPlugin {
         }
       })
 
-      findSlides().then(slides => {
-        const slidesJSON = JSON.stringify(sort(slides))
+      const slideChunks = getSlideChunks(compilation.chunks)
+      const slides = Object.keys(slideChunks)
+      const slidesJSON = JSON.stringify(slides)
 
-        compilation.assets['assets.json'] = {
-          source: () => slidesJSON,
-          size: () => slidesJSON.length
-        }
+      compilation.assets['assets.json'] = {
+        source: () => slidesJSON,
+        size: () => slidesJSON.length
+      }
 
-        callback()
-      })
+      callback()
     })
   }
 }

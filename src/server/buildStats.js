@@ -6,11 +6,18 @@ import resolvePaths from '../utils/resolvePaths'
 class BuildStats {
   constructor() {
     const requirePath = resolvePaths(getBuildFolder(true), 'assets.json')
-    this.slides = require(requirePath)
+    const { slides, slideAssetIds } = require(requirePath)
+
+    this.slides = slides
+    this.slideAssetIds = slideAssetIds
   }
 
   getSlideNames() {
     return this.slides.map(x => x.replace('slides/', ''))
+  }
+
+  getSlideAssets() {
+    return this.slideAssetIds.map(id => `chunk/${id}.js`)
   }
 
   getSlides() {

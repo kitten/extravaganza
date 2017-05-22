@@ -2,7 +2,7 @@ import mitt from 'mitt'
 import Loadable from 'react-loadable'
 
 import history from './history'
-import { getActiveState, getActiveSlideId } from './utils/currentSlide'
+import { getActiveState } from './utils/currentSlide'
 import { loadSlide } from './utils/slideLoaders'
 import Loading from './components/loading'
 
@@ -34,7 +34,10 @@ class SlideManager {
   prepareSlides(slideNames, preload = false) {
     this.isReady = false
 
-    const { id = -1, mode } = getActiveState(slideNames.length) || {}
+    const { id = -1, mode } = getActiveState(
+      window.location.pathname,
+      slideNames.length
+    ) || {}
 
     return Promise.all(
       slideNames.map(async (routeName, index) => {
@@ -85,7 +88,10 @@ class SlideManager {
   }
 
   gotoNext() {
-    const { id, path } = getActiveState(this.slides.length)
+    const { id, path } = getActiveState(
+      window.location.pathname,
+      this.slides.length
+    )
     const nextId = id === undefined ? 0 : id + 1
 
     if (nextId < this.slides.length) {
@@ -96,7 +102,10 @@ class SlideManager {
   }
 
   gotoPrev() {
-    const { id, path } = getActiveState(this.slides.length)
+    const { id, path } = getActiveState(
+      window.location.pathname,
+      this.slides.length
+    )
     const nextId = id === undefined ? 0 : id - 1
 
     if (nextId >= 0) {
@@ -112,14 +121,17 @@ class SlideManager {
   }
 
   togglePresenterMode() {
-    const { id, mode } = getActiveState(this.slides.length)
+    const { id, mode } = getActiveState(
+      window.location.pathname,
+      this.slides.length
+    )
     const nextPath = mode === 'presenter' ? '' : '/presenter'
 
     history.push(`${nextPath}/${id}`)
   }
 
   openOverview() {
-    const state = getActiveState()
+    const state = getActiveState(window.location.pathname, this.slides.length)
 
     if (state !== undefined) {
       history.push('/overview')
@@ -129,7 +141,10 @@ class SlideManager {
   updateState({ key, newValue }) {
     if (key === LOCALSTORAGE_KEY) {
       const { slide } = JSON.parse(newValue)
-      const { id, path } = getActiveState(this.slides.length)
+      const { id, path } = getActiveState(
+        window.location.pathname,
+        this.slides.length
+      )
 
       if (
         typeof slide === 'number' &&

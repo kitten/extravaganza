@@ -1,6 +1,6 @@
 import sort from 'alphanum-sort'
 
-import getSlideChunks from '../utils/getSlideChunks'
+import getSlideChunks from '../../utils/getSlideChunks'
 
 class SuppressEntryChunksPlugin {
   constructor() {

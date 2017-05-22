@@ -1,9 +1,9 @@
 node_modules
 npm-debug.log.*
-dist
+/dist
 .DS_Store
 bundle-stats.html
 .extravaganza
-lib
-build
-slides
+/lib
+/build
+/slides

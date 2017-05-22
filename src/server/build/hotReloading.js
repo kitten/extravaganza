@@ -1,19 +1,19 @@
-import { createElement } from 'react'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import sort from 'alphanum-sort'
 
-import { getBuildFolder } from '../user/config'
-import resolvePaths from '../utils/resolvePaths'
-import webpackCompiler from '../webpack/compiler'
-import getSlideChunks from '../webpack/utils/getSlideChunks'
+import Build from './abstract'
+import webpackCompiler from '../../webpack/compiler'
+import getSlideChunks from '../../utils/getSlideChunks'
 
 const deleteCache = path => {
   delete require.cache[path]
 }
 
-class HotReloading {
+class HotReloading extends Build {
   constructor() {
+    super(false)
+
     this.success = false
     this.slides = []
     this.slideAssetIds = []
@@ -87,30 +87,6 @@ class HotReloading {
         this.stats = stats
         resolve(stats)
       })
-    })
-  }
-
-  getSlideNames() {
-    return this.slides.map(x => x.replace('slides/', ''))
-  }
-
-  getSlideAssets() {
-    return this.slideAssetIds.map(id => `chunk/${id}.js`)
-  }
-
-  getSlides() {
-    return this.slides.map(routeName => {
-      const requirePath = resolvePaths(
-        getBuildFolder(false),
-        `dist/${routeName}`
-      )
-
-      const component = () => {
-        const WrappedComponent = require(requirePath).default
-        return createElement(WrappedComponent)
-      }
-
-      return component
     })
   }
 }

@@ -1,15 +1,11 @@
 import { createElement } from 'react'
 
-import { getBuildFolder } from '../user/config'
-import resolvePaths from '../utils/resolvePaths'
+import { getBuildFolder } from '../../user/config'
+import resolvePaths from '../../utils/resolvePaths'
 
-class BuildStats {
-  constructor() {
-    const requirePath = resolvePaths(getBuildFolder(true), 'assets.json')
-    const { slides, slideAssetIds } = require(requirePath)
-
-    this.slides = slides
-    this.slideAssetIds = slideAssetIds
+class Build {
+  constructor(production = false) {
+    this.production = production
   }
 
   getSlideNames() {
@@ -23,7 +19,7 @@ class BuildStats {
   getSlides() {
     return this.slides.map(routeName => {
       const requirePath = resolvePaths(
-        getBuildFolder(true),
+        getBuildFolder(this.production),
         `dist/${routeName}`
       )
       const component = () => {
@@ -36,4 +32,4 @@ class BuildStats {
   }
 }
 
-export default BuildStats
+export default Build

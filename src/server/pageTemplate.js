@@ -8,11 +8,10 @@ const sanitizeCSS = readFileSync(
 
 const injectScripts = names =>
   names
-    .map(
-      name => `
-  <script type="text/javascript" src="/_extravaganza/${name}"></script>
-`
-    )
+    .map(name => {
+      const async = name.startsWith('chunk/') ? 'async' : ''
+      return `<script ${async} type="text/javascript" src="/_extravaganza/${name}"></script>`.trim()
+    })
     .join('\n')
 
 const makePageTemplate = (html, css, scripts, slideNames) => `

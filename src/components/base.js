@@ -47,6 +47,8 @@ const base = css`
   border: ${p => p.border || 'none'};
   background: ${p => (p.background ? ensureColour(p.background) : 'none')};
 
+  opacity: ${p => p.opacity || 1};
+
   ${baseFontSize(0)}
 
   ${p => p.width && css`

@@ -13,8 +13,6 @@ const Wrapper = styled.div`
   height: 100%;
 
   ${base}
-
-  background: ${p => p.background || p.theme.colors.background};
 `
 
 const Content = styled.div`

@@ -18,5 +18,6 @@ module.exports = {
   },
   codeBlockTheme: prismLight,
   playgroundTheme: prismDark,
-  transitions: ['fade']
+  transitions: ['fade'],
+  components: {}
 }

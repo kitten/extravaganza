@@ -1,6 +1,6 @@
 {
   "name": "extravaganza",
-  "version": "1.0.0-12",
+  "version": "1.0.0-13",
   "description": "Framework for React-powered presentations",
   "main": "index.js",
   "bin": {

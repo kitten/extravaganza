@@ -74,7 +74,9 @@ class PresenterView extends Component {
     this.setState({ notes: null })
 
     if (loadable.loader) {
-      loadable.loader().then(({ notes }) => {
+      loadable.loader().then(slide => {
+        const { notes } = slide.default || {}
+
         if (notes) {
           this.setState({ notes })
         }
@@ -88,9 +90,7 @@ class PresenterView extends Component {
   }
 
   componentWillReceiveProps({ id, slides }) {
-    if (id !== this.props.id || slides !== this.props.slides) {
-      this.loadNotes(slides[id])
-    }
+    this.loadNotes(slides[id])
   }
 
   render() {

@@ -52,12 +52,16 @@ class SlideManager {
           return (await loader()).default
         }
 
-        return Loadable({
+        const SlideLoadable = Loadable({
           loader,
           resolveModule: module => module.default,
           LoadingComponent: Loading,
           delay: 200
         })
+
+        SlideLoadable.loader = loader
+
+        return SlideLoadable
       })
     ).then(slides => {
       this.slides = slides

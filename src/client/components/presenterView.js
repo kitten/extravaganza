@@ -1,4 +1,4 @@
-import React, { createElement } from 'react'
+import React, { Component, createElement } from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
@@ -18,6 +18,20 @@ const Wrapper = styled.div`
 const Column = styled.div`
   display: block;
   padding: 20px 0 20px 0;
+`
+
+const Notes = styled.pre`
+  background: #fff;
+  color: #000;
+  font-size: 18px;
+  line-height: 1.5;
+
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.22), 0 24px 24px rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+
+  margin: 20px;
+  padding: 20px;
+  width: 100%;
 `
 
 const SlideContainer = styled.div`
@@ -47,20 +61,65 @@ const TheEnd = styled.div`
   justify-content: center;
 `
 
-const PresenterView = ({ id, slides }) => (
-  <Wrapper>
-    <Column>
-      <SlideContainer>
-        {createElement(slides[id])}
-      </SlideContainer>
+class PresenterView extends Component {
+  state = {
+    notes: null
+  }
 
-      <SlideContainer small>
-        {slides[id + 1] !== undefined
-          ? createElement(slides[id + 1])
-          : <TheEnd>Fin.</TheEnd>}
-      </SlideContainer>
-    </Column>
-  </Wrapper>
-)
+  loadNotes = loadable => {
+    if (loadable.notes) {
+      return this.setState({ notes: loadable.notes })
+    }
+
+    this.setState({ notes: null })
+
+    if (loadable.loader) {
+      loadable.loader().then(({ notes }) => {
+        if (notes) {
+          this.setState({ notes })
+        }
+      })
+    }
+  }
+
+  componentDidMount() {
+    const { id, slides } = this.props
+    this.loadNotes(slides[id])
+  }
+
+  componentWillReceiveProps({ id, slides }) {
+    if (id !== this.props.id || slides !== this.props.slides) {
+      this.loadNotes(slides[id])
+    }
+  }
+
+  render() {
+    const { id, slides } = this.props
+    const { notes } = this.state
+
+    return (
+      <Wrapper>
+        <Column>
+          <SlideContainer>
+            {createElement(slides[id])}
+          </SlideContainer>
+
+          <SlideContainer small>
+            {slides[id + 1] !== undefined
+              ? createElement(slides[id + 1])
+              : <TheEnd>Fin.</TheEnd>}
+          </SlideContainer>
+        </Column>
+
+        <Column>
+          {notes &&
+            <Notes>
+              {typeof notes === 'string' ? notes.trim() : notes}
+            </Notes>}
+        </Column>
+      </Wrapper>
+    )
+  }
+}
 
 export default PresenterView

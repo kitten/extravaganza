@@ -11,7 +11,7 @@ class InnerApp extends Component {
   componentWillMount() {
     const { theme } = this.props
 
-    const googleFontQuery = `${theme.googleFont.name}:${theme.googleFont.weights.join(',')}`
+    const googleFontQuery = `${theme.googleFont.name.replace(/ /g, '+')}:${theme.googleFont.weights.join(',')}`
 
     injectGlobal`
       @import url('https://fonts.googleapis.com/css?family=${googleFontQuery}');

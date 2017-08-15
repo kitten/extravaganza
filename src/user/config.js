@@ -37,3 +37,14 @@ export const getThemePath = () =>
     getContext(),
     getConfig().themePath || require.resolve('./defaultTheme')
   )
+
+export const getAlias = () => getConfig().alias || {}
+
+export const transformConfig = config => {
+  const { transformWebpackConfig } = getConfig()
+  if (typeof transformWebpackConfig === 'function') {
+    return transformWebpackConfig(config)
+  }
+
+  return config
+}

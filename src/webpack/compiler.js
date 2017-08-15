@@ -22,7 +22,9 @@ import {
   getTempFolder,
   getSlidesFolder,
   getThemePath,
-  getHappyPackCache
+  getHappyPackCache,
+  getAlias,
+  transformConfig
 } from '../user/config'
 
 const nodePathList = (process.env.NODE_PATH || '')
@@ -92,6 +94,8 @@ const makeCompiler = async ({ production }) => {
     },
 
     module: {
+      noParse: /(mapbox-gl)\.js$/,
+
       rules: [
         {
           test: /\.json$/,
@@ -122,6 +126,7 @@ const makeCompiler = async ({ production }) => {
 
     resolve: {
       alias: {
+        ...getAlias(),
         'extravaganza/theme': getThemePath()
       },
       extensions: ['.js', '.json'],
@@ -216,7 +221,7 @@ const makeCompiler = async ({ production }) => {
   await rm(getBuildFolder(production))
   await mkdirp(getHappyPackCache())
 
-  return webpack(config)
+  return webpack(transformConfig(config))
 }
 
 export default makeCompiler

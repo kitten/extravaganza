@@ -13,6 +13,7 @@ const Container = styled.div`
 const Text = styled.span`
   display: block;
   font-size: 16px;
+  text-align: center;
   margin: 0;
   padding: 0;
   transform: scale(${p => p.scale});

@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components'
 
 import base, { baseFontSize } from './base'
 import Slide from './Slide'
+import './utils/prismExtensions'
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live'
 
 const Provider = styled(LiveProvider)`

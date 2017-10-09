@@ -11,13 +11,21 @@ class InnerApp extends Component {
   componentWillMount() {
     const { theme } = this.props
 
-    const googleFontQuery = `${theme.googleFont.name.replace(/ /g, '+')}:${theme.googleFont.weights.join(',')}`
+    if (theme.font.googleFont) {
+      const googleFontQuery = `${theme.googleFont.name.replace(/ /g, '+')}:${theme.googleFont.weights.join(',')}`
+
+      injectGlobal`
+        @import url('https://fonts.googleapis.com/css?family=${googleFontQuery}');
+      `
+    }
+
+    if (theme.global) {
+      injectGlobal`${theme.global}`
+    }
 
     injectGlobal`
-      @import url('https://fonts.googleapis.com/css?family=${googleFontQuery}');
-
       html, body {
-        font-family: ${theme.googleFont.name}, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        font-family: ${theme.font.name}, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
         background: ${theme.colors.background};
         color: ${theme.colors.primary};
         font-size: 50px;

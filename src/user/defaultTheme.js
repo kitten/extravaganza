@@ -7,7 +7,8 @@ module.exports = {
     fontRatio: 'perfectFourth',
     padding: 50
   },
-  googleFont: {
+  font: {
+    googleFont: true,
     name: 'Montserrat',
     weights: [400, 600]
   },

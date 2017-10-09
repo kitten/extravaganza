@@ -23,11 +23,12 @@ const Content = styled.div`
   height: ${baseHeight}px;
   width: ${p => (p.theme.slide.aspectRatio || 4 / 3) * baseHeight}px;
   padding: ${p => ensureUnit(p.theme.slide.padding || 50)};
+  text-align: left;
   overflow: hidden;
-  text-align: center;
 
   transform-origin: 50% 50%;
   transform: translate(-50%, -50%) scale(${p => p.scale});
+  z-index: 10;
 
   ${flex('column')}
 `
@@ -72,7 +73,7 @@ class Slide extends Component {
   }
 
   render() {
-    const { children } = this.props
+    const { renderBackground, children } = this.props
     const { scale } = this.state
 
     return (
@@ -84,6 +85,10 @@ class Slide extends Component {
         >
           {children}
         </Content>
+
+        {typeof renderBackground === 'function'
+          ? renderBackground({ scale })
+          : undefined}
       </Wrapper>
     )
   }

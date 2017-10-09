@@ -1,17 +1,7 @@
 import React, { Component } from 'react'
 import styled, { css } from 'styled-components'
 
-import { highlight, languages } from 'prismjs/components/prism-core'
-import 'prismjs/components/prism-clike'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-markup'
-import 'prismjs/components/prism-jsx'
-import 'prismjs/components/prism-json'
-import 'prismjs/components/prism-css'
-import 'prismjs/components/prism-css-extras'
-import 'prismjs/components/prism-sass'
-import 'prismjs/components/prism-less'
-
+import { highlight, languages } from './utils/prismExtensions'
 import base, { baseFontSize } from './base'
 
 const prism = (code, language = 'jsx') => highlight(code, languages[language])

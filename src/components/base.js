@@ -36,7 +36,7 @@ export const baseFontSize = (defaultStep = 0) => css`
 
 const base = css`
   font-style: ${p => (p.italic ? 'italic' : 'inherit')};
-  font-weight: ${p => (p.bold ? 'bold' : 'inherit')};
+  font-weight: ${p => (p.bold ? '600' : p.weight || 'inherit')};
   text-transform: ${p => (p.caps ? 'uppercase' : 'none')};
   color: ${p => (p.textColor ? ensureColour(p.textColor) : 'inherit')};
   line-height: ${p => p.lineHeight || 1.2};

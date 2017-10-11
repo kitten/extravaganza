@@ -17,7 +17,10 @@ const Wrapper = styled.div`
 
 const Column = styled.div`
   display: block;
-  padding: 20px 0 20px 0;
+  flex-basis: 50%;
+  width: 50%;
+  max-width: 50%;
+  ${p => (p.pad ? '20px' : '20px 0')};
 `
 
 const Notes = styled.pre`
@@ -25,11 +28,11 @@ const Notes = styled.pre`
   color: #000;
   font-size: 18px;
   line-height: 1.5;
+  white-space: pre-wrap;
 
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.22), 0 24px 24px rgba(0, 0, 0, 0.3);
   border-radius: 3px;
 
-  margin: 20px;
   padding: 20px;
   width: 100%;
 `
@@ -44,9 +47,9 @@ const SlideContainer = styled.div`
   border-radius: 3px;
   overflow: hidden;
 
-  width: ${p => (p.small ? '71.1vh' : '88.9vh')};
-  height: ${p => (p.small ? '40vh' : '50vh')};
-  margin: 20px;
+  width: ${p => (p.small ? '70%' : '100%')};
+  height: ${p => (p.small ? '40%' : '57%')};
+  margin: 20px 0;
 `
 
 const TheEnd = styled.div`
@@ -111,7 +114,7 @@ class PresenterView extends Component {
           </SlideContainer>
         </Column>
 
-        <Column>
+        <Column pad>
           {notes &&
             <Notes>
               {typeof notes === 'string' ? notes.trim() : notes}
